@@ -1,9 +1,5 @@
 package com.example.imagepro;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
@@ -13,13 +9,22 @@ import android.view.SurfaceView;
 import android.view.Window;
 import android.view.WindowManager;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+
+import java.io.IOException;
+import java.util.List;
 
 public class CameraActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2{
     private static final String TAG="MainActivity";
@@ -27,22 +32,16 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     private Mat mRgba;
     private Mat mGray;
     private CameraBridgeViewBase mOpenCvCameraView;
-    private BaseLoaderCallback mLoaderCallback =new BaseLoaderCallback(this) {
+    private ObjectDetector objectDetectorClass;
+    private final BaseLoaderCallback mLoaderCallback =new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
-            switch (status){
-                case LoaderCallbackInterface
-                        .SUCCESS:{
-                    Log.i(TAG,"OpenCv Is loaded");
-                    mOpenCvCameraView.enableView();
-                }
-                default:
-                {
-                    super.onManagerConnected(status);
-
-                }
-                break;
+            if (status == LoaderCallbackInterface
+                    .SUCCESS) {
+                Log.i(TAG, "OpenCv Is loaded");
+                mOpenCvCameraView.enableView();
             }
+            super.onManagerConnected(status);
         }
     };
 
@@ -65,10 +64,17 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
         setContentView(R.layout.activity_camera);
 
-        mOpenCvCameraView=(CameraBridgeViewBase) findViewById(R.id.frame_Surface);
+        mOpenCvCameraView= findViewById(R.id.frame_Surface);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
-
+        try{
+            objectDetectorClass=new ObjectDetector(getAssets(), "cars.tflite", "labelmap.txt", 640);
+            Log.d("mMainActivity", "Model is successfully loaded");
+        }
+        catch(IOException e){
+            Log.d("mMainActivity", "Model crashed while loading");
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -104,17 +110,40 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
     public void onCameraViewStarted(int width ,int height){
         mRgba=new Mat(height,width, CvType.CV_8UC4);
-        mGray =new Mat(height,width,CvType.CV_8UC1);
+        mGray=new Mat(height,width,CvType.CV_8UC1);
     }
+
     public void onCameraViewStopped(){
         mRgba.release();
     }
+
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame){
         mRgba=inputFrame.rgba();
         mGray=inputFrame.gray();
 
-        return mRgba;
+        List<Prediction> predicts = objectDetectorClass.recognizeImage(mRgba);
+        Mat out = drawPredicts(mRgba, predicts);
+        return out;
+    }
 
+    private Mat drawPredicts(Mat in, List<Prediction> predicts){
+
+        if(predicts.isEmpty()){
+            return  in;
+        }
+
+        // Rotate original image by 90 degree to get portrait frame
+        Mat out=new Mat();
+        Core.flip(in.t(), out, 1);
+
+        for(Prediction predict: predicts){
+            Imgproc.rectangle(out, new Point(predict.getLeftX(), predict.getDownY()), new Point(predict.getRightX(), predict.getUpperY()), new Scalar(255, 155, 155), 2);
+        }
+
+        // Rotate back by -90 degree
+        Core.flip(out.t(), out, 0);
+
+        return out;
     }
 
 }
