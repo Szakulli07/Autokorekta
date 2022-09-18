@@ -103,6 +103,11 @@ public class Prediction {
         return upperY;
     }
 
+    public double[] getCoords(){
+        double[] coords = {this.getCenterX(), this.getCenterY()};
+        return coords;
+    }
+
     public float getHeight() {
         return height;
     }

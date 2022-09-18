@@ -23,4 +23,5 @@ public class Tile {
     public Prediction getCarPart() {
         return this.carPart;
     }
+    public double[] getCoords(){ return this.carPart.getCoords(); }
 }

@@ -103,7 +103,7 @@ public class ObjectDetector {
         Map<Boolean, List<Prediction>> partitions = predicts.stream()
                 .collect(Collectors.partitioningBy(p -> (teamLabelList.contains(p.getLabel()))));
         this.teamPredicts = partitions.get(true);
-        this.predicts = partitions.get(false);;
+        this.predicts = partitions.get(false);
     }
 
     public void recognizeImage(Mat mat_image) {

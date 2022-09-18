@@ -1,5 +1,7 @@
 package com.example.imagepro;
 
+import net.sf.javaml.core.kdtree.KDTree;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,32 +21,25 @@ public class TileDetector {
 
     public void detectTiles(List<Prediction> predictions){
         Map<Boolean, List<Prediction>> partitions = predictions.stream()
-                .collect(Collectors.partitioningBy(p -> (p.isSmallLabel())));
+                .collect(Collectors.partitioningBy(Prediction::isSmallLabel));
         List<Prediction> smallPredictions = partitions.get(true);
         List<Prediction> bigPredictions = partitions.get(false);
         List<Tile> tiles = bigPredictions.stream()
-                .map(p -> new Tile(p))
+                .map(Tile::new)
                 .collect(Collectors.toList());
         List<Tile> result = findNearest(smallPredictions, tiles);
         this.setTiles(result);
     }
 
     public List<Tile> findNearest(List<Prediction> smallPreds, List<Tile> tiles){
+        KDTree kdTree = new KDTree(2);
+        for(int tileId=0; tileId<tiles.size(); tileId++){
+            kdTree.insert(tiles.get(tileId).getCoords(), tileId);
+        }
+
         for(Prediction pred: smallPreds){
-            int bestTileId = -1;
-            float bestTileDistance = Float.MAX_VALUE;
-            float predX = pred.getCenterX();
-            float predY = pred.getCenterY();
-            for(int id=0; id<tiles.size(); id++){
-                float tileX = tiles.get(id).getCarPart().getCenterX();
-                float tileY = tiles.get(id).getCarPart().getCenterY();
-                float distance = (float)Math.pow(tileX - predX, 2) + (float)Math.pow(tileY - predY, 2);
-                if (distance < bestTileDistance){
-                    bestTileDistance = distance;
-                    bestTileId = id;
-                }
-            }
-            tiles.get(bestTileId).addCarType(pred);
+            int tileId = (int)kdTree.nearest(pred.getCoords());
+            tiles.get(tileId).addCarType(pred);
         }
 
         return tiles;

@@ -1,16 +1,14 @@
 package com.example.imagepro;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import org.opencv.android.OpenCVLoader;
+import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.IOException;
+import org.opencv.android.OpenCVLoader;
 
 public class MainActivity extends AppCompatActivity {
     static {
