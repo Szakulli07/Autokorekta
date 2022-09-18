@@ -20,7 +20,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -29,21 +28,24 @@ import java.util.stream.Collectors;
 public class ObjectDetector {
 
     private final Interpreter interpreter;
-    private final float SCORE_THRESHOLD = 0.5f;
+    private final float SCORE_THRESHOLD = 0.7f;
 
     private final List<String> labelList;
+    private final List<Integer> smallLabelList;
+    private final List<Integer> teamLabelList;
+
     private final int INPUT_SIZE;
     private final int PIXEL_SIZE = 3;
     private final int IMAGE_MEAN = 0;
     private final float IMAGE_STD = 255.0f;
 
-    private int height;
-    private int width;
+    private List<Prediction> predicts = new ArrayList<>();
+    private List<Prediction> teamPredicts = new ArrayList<>();
+    private boolean isDetecting = false;
 
-    private List<float[]> predicts = new ArrayList<>();
-    private boolean detecting = false;
-
-    ObjectDetector(AssetManager assetManager, String modelPath, String labelPath, int inputSize) throws IOException {
+    ObjectDetector(AssetManager assetManager, String modelPath,
+                   String labelPath, String smallLabelPath, String teamLabelPath,
+                   int inputSize) throws IOException {
         INPUT_SIZE = inputSize;
 
         // Initialize interpreter with GPU delegate
@@ -62,14 +64,15 @@ public class ObjectDetector {
 
         interpreter = new Interpreter(loadModelFile(assetManager, modelPath), options);
         labelList = loadLabelList(assetManager, labelPath);
-    }
+        smallLabelList = loadLabelList(assetManager, smallLabelPath)
+                                .stream()
+                                .map(labelList::indexOf)
+                                .collect(Collectors.toList());
+        teamLabelList = loadLabelList(assetManager, teamLabelPath)
+                .stream()
+                .map(labelList::indexOf)
+                .collect(Collectors.toList());
 
-    public List<float[]> getPredicts() {
-        return predicts;
-    }
-
-    public boolean isDetecting() {
-        return detecting;
     }
 
     private List<String> loadLabelList(AssetManager assetManager, String labelPath) throws IOException {
@@ -93,7 +96,32 @@ public class ObjectDetector {
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
     }
 
-    public List<Prediction> recognizeImage(Mat mat_image) {
+    public List<Prediction> getPredicts() {
+        return predicts;
+    }
+
+    private void setAllPredicts(List<Prediction> predicts){
+        Map<Boolean, List<Prediction>> partitions = predicts.stream()
+                .collect(Collectors.partitioningBy(p -> (teamLabelList.contains(p.getLabel()))));
+        this.teamPredicts = partitions.get(true);
+        this.predicts = partitions.get(false);;
+        this.changeDetecting(false);
+    }
+
+    private synchronized void changeDetecting(boolean isDetecting){
+        this.isDetecting = isDetecting;
+    }
+
+    public synchronized boolean accessDetector(){
+        if(this.isDetecting){
+            return  false;
+        }else{
+            this.changeDetecting(true);
+            return true;
+        }
+    }
+
+    public void recognizeImage(Mat mat_image) {
 
         // Rotate original image by 90 degree to get portrait frame
         Mat rotated_mat_image = new Mat();
@@ -104,8 +132,8 @@ public class ObjectDetector {
         bitmap = Bitmap.createBitmap(rotated_mat_image.cols(), rotated_mat_image.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(rotated_mat_image, bitmap);
 
-        height = bitmap.getHeight();
-        width = bitmap.getWidth();
+        float height = bitmap.getHeight();
+        float width = bitmap.getWidth();
 
         Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, INPUT_SIZE, INPUT_SIZE, false);
 
@@ -118,7 +146,7 @@ public class ObjectDetector {
 
         Map<Integer, Object> output_map = new TreeMap<>();
 
-        float[][][] output = new float[1][25200][23];
+        float[][][] output = new float[1][25200][24];
 
         output_map.put(0, output);
 
@@ -134,11 +162,15 @@ public class ObjectDetector {
 
         Log.d("CARS", "After casting");
 
-        List<float[]> highScorePredicts = filterPredictsByScore(predicts, SCORE_THRESHOLD);
+        List<float[]> highScorePredicts = this.filterPredictsByScore(predicts, SCORE_THRESHOLD);
         List<Prediction> preNonMaxSuppressionPredicts = highScorePredicts.stream()
-                                                                        .map(predict -> new Prediction(this.height, this.width, predict))
+                                                                        .map(predict -> new Prediction(height, width, predict, smallLabelList))
                                                                         .collect(Collectors.toList());
-        return nonMaxSuppression(preNonMaxSuppressionPredicts, 0.5F);
+
+
+        List<Prediction> result = nonMaxSuppression(preNonMaxSuppressionPredicts, 0.5f);
+
+        this.setAllPredicts(result);
     }
 
     private ByteBuffer convertBitmapToByteBuffer(Bitmap bitmap) {
@@ -191,14 +223,14 @@ public class ObjectDetector {
             Prediction bestBox = predicts.get(predicts.size() - 1);
             predicts.remove(predicts.size() - 1);
             keep.add(bestBox);
-            Log.d("DETECTED_CLASS", labelList.get((int) bestBox.getLabel()));
+            Log.d("DETECTED_CLASS", labelList.get(bestBox.getLabel()));
 
             // Remove overlapping boxes
             List<Integer> removeIndices = new ArrayList<>();
             for(int i=0; i<predicts.size(); i++){
                 // Check if same class
                 Prediction compareBox = predicts.get(i);
-                if(!(isSmallSignClass(compareBox.getLabel()) ^ !isSmallSignClass(bestBox.getLabel()))){
+                if(compareBox.isSmallLabel() ^ bestBox.isSmallLabel()){
                     continue;
                 }
 
@@ -213,10 +245,5 @@ public class ObjectDetector {
             }
         }
         return keep;
-    }
-
-    private boolean isSmallSignClass(int label){
-        List<Integer> small = Arrays.asList( 4, 5, 11, 15, 17 );
-        return small.contains(label);
     }
 }

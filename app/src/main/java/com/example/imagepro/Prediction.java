@@ -4,6 +4,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import java.util.Comparator;
+import java.util.List;
 
 
 public class Prediction {
@@ -20,14 +21,17 @@ public class Prediction {
 
     private int label;
     private float labelScore;
+    private boolean isSmallLabel;
 
-    public Prediction(int height, int width, float[] predict){
+    public Prediction(float height, float width, float[] predict, List<Integer> smallLabelList){
         this.centerX = predict[0];
         this.centerY = predict[1];
         this.width = predict[2];
         this.height = predict[3];
+        this.labelScore = predict[4];
 
         this.setHighestLabel(predict);
+        this.isSmallLabel = smallLabelList.contains(this.label);
         this.setCorners(height, width);
 
     }
@@ -41,15 +45,14 @@ public class Prediction {
                 argMaxClass = i;
             }
         }
-        this.labelScore = maxClassScore;
         this.label = argMaxClass -5;
     }
 
-    private void setCorners(int height, int width){
-        this.leftX = (this.centerX - this.width) * width / 2;
-        this.downY = (this.centerY - this.height) * height / 2;
-        this.rightX = (this.centerX + this.width) * width / 2;
-        this.upperY = (this.centerY + this.height) * height / 2;
+    private void setCorners(float height, float width){
+        this.leftX = (this.centerX - this.width / 2) * width;
+        this.downY = (this.centerY - this.height / 2) * height;
+        this.rightX = (this.centerX + this.width / 2) * width;
+        this.upperY = (this.centerY + this.height / 2) * height;
     }
 
     public float getArea(){
@@ -59,15 +62,15 @@ public class Prediction {
     public float calculateIoU(Prediction pr){
 
         // Find intersection box
-        float maxLeftX = max(this.leftX, pr.leftX);
+        float minLeftX = min(this.leftX, pr.leftX);
         float maxRightX = max(this.rightX, pr.rightX);
-        float maxDownY = min(this.downY, pr.downY);
-        float maxUpperY = min(this.upperY, pr.upperY);
+        float minDownY = min(this.downY, pr.downY);
+        float maxUpperY = max(this.upperY, pr.upperY);
 
-        float intersectionWidth = max(0, maxRightX - maxLeftX);
-        float intersectionHidth = max(0, maxUpperY - maxDownY);
+        float intersectionWidth = max(0, maxRightX - minLeftX);
+        float intersectionHight = max(0, maxUpperY - minDownY);
 
-        float intersectionArea = intersectionWidth*intersectionHidth;
+        float intersectionArea = intersectionWidth*intersectionHight;
 
         float unionArea = this.getArea() + pr.getArea() - intersectionArea;
 
@@ -115,4 +118,7 @@ public class Prediction {
     public float getLabelScore() {
         return labelScore;
     }
+
+    public boolean isSmallLabel() { return isSmallLabel; }
+
 }

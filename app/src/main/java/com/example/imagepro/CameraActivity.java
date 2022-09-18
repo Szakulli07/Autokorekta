@@ -32,7 +32,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     private Mat mRgba;
     private Mat mGray;
     private CameraBridgeViewBase mOpenCvCameraView;
-    private ObjectDetector objectDetectorClass;
+    private CarGame carGame;
     private final BaseLoaderCallback mLoaderCallback =new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
@@ -68,11 +68,11 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
         try{
-            objectDetectorClass=new ObjectDetector(getAssets(), "cars.tflite", "labelmap.txt", 640);
-            Log.d("mMainActivity", "Model is successfully loaded");
+            carGame = new CarGame(getAssets());
+            Log.d("mMainActivity", "CarGame is successfully loaded");
         }
         catch(IOException e){
-            Log.d("mMainActivity", "Model crashed while loading");
+            Log.d("mMainActivity", "CarGame crashed while loading");
             e.printStackTrace();
         }
     }
@@ -121,9 +121,10 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         mRgba=inputFrame.rgba();
         mGray=inputFrame.gray();
 
-        List<Prediction> predicts = objectDetectorClass.recognizeImage(mRgba);
-        Mat out = drawPredicts(mRgba, predicts);
-        return out;
+        List<Prediction> predicts = this.carGame.getResults(mRgba);
+        Log.d("PREDS", String.valueOf(predicts.size()));
+
+        return this.drawPredicts(mRgba, predicts);
     }
 
     private Mat drawPredicts(Mat in, List<Prediction> predicts){
@@ -139,7 +140,6 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         for(Prediction predict: predicts){
             Imgproc.rectangle(out, new Point(predict.getLeftX(), predict.getDownY()), new Point(predict.getRightX(), predict.getUpperY()), new Scalar(255, 155, 155), 2);
         }
-
         // Rotate back by -90 degree
         Core.flip(out.t(), out, 0);
 
