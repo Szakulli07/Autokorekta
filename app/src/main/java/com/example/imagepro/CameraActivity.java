@@ -121,15 +121,26 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         mRgba=inputFrame.rgba();
         mGray=inputFrame.gray();
 
-        List<Prediction> predicts = this.carGame.getResults(mRgba);
-        Log.d("PREDS", String.valueOf(predicts.size()));
+        List<Tile> tiles = this.carGame.getResults();
 
-        return this.drawPredicts(mRgba, predicts);
+        if(this.carGame.accessCarGame()){
+            Thread thread = new Thread() {
+                @Override
+                public void run(){
+                    carGame.computeResults(mRgba);
+                }
+            };
+            thread.start();
+        }
+
+        Log.d("PREDS", String.valueOf(tiles.size()));
+
+        return this.drawPredicts(mRgba, tiles);
     }
 
-    private Mat drawPredicts(Mat in, List<Prediction> predicts){
+    private Mat drawPredicts(Mat in, List<Tile> tiles){
 
-        if(predicts.isEmpty()){
+        if(tiles.isEmpty()){
             return  in;
         }
 
@@ -137,8 +148,11 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         Mat out=new Mat();
         Core.flip(in.t(), out, 1);
 
-        for(Prediction predict: predicts){
-            Imgproc.rectangle(out, new Point(predict.getLeftX(), predict.getDownY()), new Point(predict.getRightX(), predict.getUpperY()), new Scalar(255, 155, 155), 2);
+        for(Tile tile: tiles){
+            Imgproc.rectangle(out,
+                    new Point(tile.getCarPart().getLeftX(), tile.getCarPart().getDownY()),
+                    new Point(tile.getCarPart().getRightX(), tile.getCarPart().getUpperY()),
+                    new Scalar(255, 155, 155), 2);
         }
         // Rotate back by -90 degree
         Core.flip(out.t(), out, 0);

@@ -10,6 +10,8 @@ import java.util.List;
 public class CarGame {
     private final ObjectDetector  objectDetector;
     private final TileDetector tileDetector = new TileDetector();
+    private boolean isDetecting = false;
+
 
     public CarGame(AssetManager assetManager) throws IOException {
             objectDetector=new ObjectDetector(assetManager,
@@ -20,17 +22,28 @@ public class CarGame {
                     640);
     }
 
-    public List<Prediction> getResults(Mat image){
-        if (objectDetector.accessDetector()){
-            Thread thread = new Thread() {
-                @Override
-                public void run(){
-                    objectDetector.recognizeImage(image);
-                }
-            };
-            thread.start();
-        }
+    private synchronized void changeDetecting(boolean isDetecting){
+        this.isDetecting = isDetecting;
+    }
 
-        return objectDetector.getPredicts();
+    public synchronized boolean accessCarGame(){
+        if(this.isDetecting){
+            return  false;
+        }else{
+            this.changeDetecting(true);
+            return true;
+        }
+    }
+
+    public void computeResults(Mat frame){
+        this.objectDetector.recognizeImage(frame);
+        List<Prediction> predictions = this.objectDetector.getPredicts();
+        this.tileDetector.detectTiles(predictions);
+        this.changeDetecting(false);
+    }
+
+    public List<Tile> getResults(){
+        return tileDetector.getTiles();
     }
 }
+

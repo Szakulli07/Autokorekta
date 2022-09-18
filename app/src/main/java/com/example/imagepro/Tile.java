@@ -1,49 +1,26 @@
 package com.example.imagepro;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Tile {
-    private boolean isBiofuel = false;
-    private boolean isElectric = false;
-    private boolean isHybrid = false;
-    private boolean isSolar = false;
-    private Prediction prediction;
+    private boolean isBiofuel;
+    private boolean isElectric;
+    private boolean isHybrid;
+    private boolean isSolar;
 
-    public Tile(Prediction prediction) {
-        this.prediction = prediction;
+    private List<Prediction> carTypes = new ArrayList<>();
+    private Prediction carPart;
+
+    public Tile(Prediction carPart) {
+        this.carPart = carPart;
     }
 
-    public boolean isBiofuel() {
-        return isBiofuel;
+    public void addCarType(Prediction carType){
+        this.carTypes.add(carType);
     }
 
-    public void setBiofuel(boolean biofuel) {
-        isBiofuel = biofuel;
-    }
-
-    public boolean isElectric() {
-        return isElectric;
-    }
-
-    public void setElectric(boolean electric) {
-        isElectric = electric;
-    }
-
-    public boolean isHybrid() {
-        return isHybrid;
-    }
-
-    public void setHybrid(boolean hybrid) {
-        isHybrid = hybrid;
-    }
-
-    public boolean isSolar() {
-        return isSolar;
-    }
-
-    public void setSolar(boolean solar) {
-        isSolar = solar;
-    }
-
-    public Prediction getPrediction() {
-        return prediction;
+    public Prediction getCarPart() {
+        return this.carPart;
     }
 }

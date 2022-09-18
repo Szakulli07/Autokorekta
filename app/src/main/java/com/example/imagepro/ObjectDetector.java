@@ -41,7 +41,6 @@ public class ObjectDetector {
 
     private List<Prediction> predicts = new ArrayList<>();
     private List<Prediction> teamPredicts = new ArrayList<>();
-    private boolean isDetecting = false;
 
     ObjectDetector(AssetManager assetManager, String modelPath,
                    String labelPath, String smallLabelPath, String teamLabelPath,
@@ -105,20 +104,6 @@ public class ObjectDetector {
                 .collect(Collectors.partitioningBy(p -> (teamLabelList.contains(p.getLabel()))));
         this.teamPredicts = partitions.get(true);
         this.predicts = partitions.get(false);;
-        this.changeDetecting(false);
-    }
-
-    private synchronized void changeDetecting(boolean isDetecting){
-        this.isDetecting = isDetecting;
-    }
-
-    public synchronized boolean accessDetector(){
-        if(this.isDetecting){
-            return  false;
-        }else{
-            this.changeDetecting(true);
-            return true;
-        }
     }
 
     public void recognizeImage(Mat mat_image) {
