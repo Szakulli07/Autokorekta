@@ -3,9 +3,6 @@ package com.example.imagepro;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-import java.util.Comparator;
-import java.util.List;
-
 
 public class Prediction {
     private final float centerX;
@@ -19,24 +16,26 @@ public class Prediction {
     private final float height;
     private final float width;
 
-    private int label;
-    private float labelScore;
-    private boolean isSmallLabel;
+    private final Label label;
+    private final float labelScore;
+    private final boolean isSmallLabel;
+    private final boolean isTeamLabel;
 
-    public Prediction(float height, float width, float[] predict, List<Integer> smallLabelList){
-        this.centerX = predict[0];
-        this.centerY = predict[1];
-        this.width = predict[2];
-        this.height = predict[3];
+    public Prediction(float height, float width, float[] predict){
+        this.centerX = predict[0] * width;
+        this.centerY = predict[1] * height;
+        this.width = predict[2] * width;
+        this.height = predict[3] * height;
         this.labelScore = predict[4];
 
-        this.setHighestLabel(predict);
-        this.isSmallLabel = smallLabelList.contains(this.label);
-        this.setCorners(height, width);
+        this.label = setHighestLabel(predict);
+        this.isSmallLabel = Label.isLabelSmall(this.label);
+        this.isTeamLabel = Label.isLabelTeam(this.label);
+        this.setCorners();
 
     }
 
-    private void setHighestLabel(float[] predict){
+    private Label setHighestLabel(float[] predict){
         int argMaxClass = -1;
         float maxClassScore = -1;
         for (int i = 5; i < predict.length; i++) {
@@ -45,14 +44,14 @@ public class Prediction {
                 argMaxClass = i;
             }
         }
-        this.label = argMaxClass -5;
+        return Label.getLabelFromId(argMaxClass-5);
     }
 
-    private void setCorners(float height, float width){
-        this.leftX = (this.centerX - this.width / 2) * width;
-        this.downY = (this.centerY - this.height / 2) * height;
-        this.rightX = (this.centerX + this.width / 2) * width;
-        this.upperY = (this.centerY + this.height / 2) * height;
+    private void setCorners(){
+        this.leftX = (this.centerX - this.width / 2) ;
+        this.downY = (this.centerY - this.height / 2);
+        this.rightX = (this.centerX + this.width / 2);
+        this.upperY = (this.centerY + this.height / 2);
     }
 
     public float getArea(){
@@ -74,9 +73,14 @@ public class Prediction {
 
         float unionArea = this.getArea() + pr.getArea() - intersectionArea;
 
-        float iou = intersectionArea / unionArea;
+        return intersectionArea / unionArea;
+    }
 
-        return iou;
+    public float getDistance(Prediction prediction){
+        float distance = 0;
+        distance += Math.pow(this.getCenterX()- prediction.getCenterX(), 2);
+        distance += Math.pow(this.getCenterY()- prediction.getCenterY(), 2);
+        return (float) Math.sqrt(distance);
     }
 
     public float getCenterX() {
@@ -104,8 +108,7 @@ public class Prediction {
     }
 
     public double[] getCoords(){
-        double[] coords = {this.getCenterX(), this.getCenterY()};
-        return coords;
+        return new double[]{this.getCenterX(), this.getCenterY()};
     }
 
     public float getHeight() {
@@ -116,7 +119,7 @@ public class Prediction {
         return width;
     }
 
-    public int getLabel() {
+    public Label getLabel() {
         return label;
     }
 
@@ -126,4 +129,5 @@ public class Prediction {
 
     public boolean isSmallLabel() { return isSmallLabel; }
 
+    public boolean isTeamLabel() { return isTeamLabel; }
 }

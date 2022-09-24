@@ -1,5 +1,7 @@
 package com.example.imagepro;
 
+import android.service.autofill.FillEventHistory;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,16 +11,18 @@ public class Tile {
     private boolean isHybrid;
     private boolean isSolar;
 
-    private List<Prediction> carTypes = new ArrayList<>();
-    private Prediction carPart;
+    public float size=0;
+
+    private final List<Prediction> carTypes;
+    private List<Tile> neighbours = new ArrayList<>();
+    private final Prediction carPart;
     private Rotation rotation;
 
-    public Tile(Prediction carPart) {
+    public Tile(Prediction carPart, List<Prediction> carTypes) {
         this.carPart = carPart;
-    }
-
-    public void addCarType(Prediction carType){
-        this.carTypes.add(carType);
+        this.carTypes = carTypes;
+        this.setRotation();
+        this.setSize();
     }
 
     public Prediction getCarPart() {
@@ -28,13 +32,15 @@ public class Tile {
     public double[] getCoords(){ return this.carPart.getCoords(); }
 
     public Rotation getRotation(){
-        if( this.rotation == null){
-            this.setRotation();
-        }
         return this.rotation;
     }
 
+
     private void setRotation(){
+        if(carTypes == null){
+            this.rotation = Rotation.ERROR;
+            return;
+        }
         switch (this.carTypes.size()){
             case 1:
                 this.rotation = this.getRotationFromOne();
@@ -43,7 +49,7 @@ public class Tile {
                 this.rotation = this.getRotationFromTwo();
                 break;
             case 3:
-                this.rotation = this.getRotationFromThreeRight();
+                this.rotation = this.getRotationFromThree();
                 break;
             default:
                 this.rotation = Rotation.ERROR;
@@ -84,6 +90,18 @@ public class Tile {
             return Rotation.UPPER;
         }else{
             return Rotation.DOWN;
+        }
+    }
+
+    private Rotation getRotationFromThree() {
+        switch (this.carPart.getLabel()){
+            case ON_BOARD_COMPUTER:
+                return this.getRotationFromThreeLeft();
+            case ENGINE:
+
+                return this.getRotationFromThreeRight();
+            default:
+                return Rotation.ERROR;
         }
     }
 
@@ -131,5 +149,31 @@ public class Tile {
         }else{
             return Rotation.UPPER;
         }
+    }
+
+    private void setSize(){
+        if(this.carTypes == null || this.carTypes.size() == 0){
+            return;
+        }
+        float distance =  this.carPart.getDistance(this.carTypes.get(0));
+        this.size = distance * 2f;
+    }
+
+    private float getDistance(Tile tile){
+        return this.carPart.getDistance(tile.getCarPart());
+    }
+
+    public void addNeighbour(Tile neighbour){
+        float distance = this.getDistance(neighbour);
+
+        if(distance < this.size){ return;}
+
+        if(distance > this.size*1.2f){ return;}
+
+        this.neighbours.add(neighbour);
+    }
+
+    public List<Tile> getNeighbours(){
+        return this.neighbours;
     }
 }

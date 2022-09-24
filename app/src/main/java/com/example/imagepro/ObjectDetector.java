@@ -30,10 +30,6 @@ public class ObjectDetector {
     private final Interpreter interpreter;
     private final float SCORE_THRESHOLD = 0.7f;
 
-    private final List<String> labelList;
-    private final List<Integer> smallLabelList;
-    private final List<Integer> teamLabelList;
-
     private final int INPUT_SIZE;
     private final int PIXEL_SIZE = 3;
     private final int IMAGE_MEAN = 0;
@@ -42,9 +38,7 @@ public class ObjectDetector {
     private List<Prediction> predicts = new ArrayList<>();
     private List<Prediction> teamPredicts = new ArrayList<>();
 
-    ObjectDetector(AssetManager assetManager, String modelPath,
-                   String labelPath, String smallLabelPath, String teamLabelPath,
-                   int inputSize) throws IOException {
+    ObjectDetector(AssetManager assetManager, String modelPath, int inputSize) throws IOException {
         INPUT_SIZE = inputSize;
 
         // Initialize interpreter with GPU delegate
@@ -62,27 +56,6 @@ public class ObjectDetector {
         }
 
         interpreter = new Interpreter(loadModelFile(assetManager, modelPath), options);
-        labelList = loadLabelList(assetManager, labelPath);
-        smallLabelList = loadLabelList(assetManager, smallLabelPath)
-                                .stream()
-                                .map(labelList::indexOf)
-                                .collect(Collectors.toList());
-        teamLabelList = loadLabelList(assetManager, teamLabelPath)
-                .stream()
-                .map(labelList::indexOf)
-                .collect(Collectors.toList());
-
-    }
-
-    private List<String> loadLabelList(AssetManager assetManager, String labelPath) throws IOException {
-        List<String> labelList = new ArrayList<>();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(assetManager.open(labelPath)));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            labelList.add(line);
-        }
-        reader.close();
-        return labelList;
     }
 
     private ByteBuffer loadModelFile(AssetManager assetManager, String modelPath) throws IOException {
@@ -101,7 +74,7 @@ public class ObjectDetector {
 
     private void setAllPredicts(List<Prediction> predicts){
         Map<Boolean, List<Prediction>> partitions = predicts.stream()
-                .collect(Collectors.partitioningBy(p -> (teamLabelList.contains(p.getLabel()))));
+                .collect(Collectors.partitioningBy(Prediction::isTeamLabel));
         this.teamPredicts = partitions.get(true);
         this.predicts = partitions.get(false);
     }
@@ -149,7 +122,7 @@ public class ObjectDetector {
 
         List<float[]> highScorePredicts = this.filterPredictsByScore(predicts, SCORE_THRESHOLD);
         List<Prediction> preNonMaxSuppressionPredicts = highScorePredicts.stream()
-                                                                        .map(predict -> new Prediction(height, width, predict, smallLabelList))
+                                                                        .map(predict -> new Prediction(height, width, predict))
                                                                         .collect(Collectors.toList());
 
 
@@ -208,7 +181,7 @@ public class ObjectDetector {
             Prediction bestBox = predicts.get(predicts.size() - 1);
             predicts.remove(predicts.size() - 1);
             keep.add(bestBox);
-            Log.d("DETECTED_CLASS", labelList.get(bestBox.getLabel()));
+            Log.d("DETECTED_CLASS", bestBox.getLabel().name());
 
             // Remove overlapping boxes
             List<Integer> removeIndices = new ArrayList<>();

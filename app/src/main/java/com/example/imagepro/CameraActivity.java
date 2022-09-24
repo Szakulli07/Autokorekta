@@ -149,14 +149,12 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         Core.flip(in.t(), out, 1);
 
         for(Tile tile: tiles){
-            Imgproc.rectangle(out,
-                    new Point(tile.getCarPart().getLeftX(), tile.getCarPart().getDownY()),
-                    new Point(tile.getCarPart().getRightX(), tile.getCarPart().getUpperY()),
-                    new Scalar(255, 155, 155), 2);
-            Imgproc.putText(out,
-                   String.valueOf(tile.getRotation()),
-                    new Point(tile.getCarPart().getLeftX(), tile.getCarPart().getDownY()),
-                    Core.FONT_HERSHEY_SIMPLEX, 1, new Scalar(255, 255, 255));
+            for(Tile neighbourTile: tile.getNeighbours()){
+                Imgproc.line(out,
+                        new Point(tile.getCarPart().getCenterX(), tile.getCarPart().getCenterY()),
+                        new Point(neighbourTile.getCarPart().getCenterX(), neighbourTile.getCarPart().getCenterY()),
+                        new Scalar(255, 155, 155), 2);
+            }
         }
         // Rotate back by -90 degree
         Core.flip(out.t(), out, 0);

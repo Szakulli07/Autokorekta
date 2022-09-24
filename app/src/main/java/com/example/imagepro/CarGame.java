@@ -16,9 +16,6 @@ public class CarGame {
     public CarGame(AssetManager assetManager) throws IOException {
             objectDetector=new ObjectDetector(assetManager,
                     "cars.tflite",
-                    "labelmap.txt",
-                    "smalllabels.txt",
-                    "teamlabels.txt",
                     640);
     }
 
