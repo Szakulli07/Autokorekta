@@ -26,6 +26,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ImagePro">
         <activity android:name=".activities.RegionActivity"></activity>
+        <activity android:name=".activities.LabelActivity"></activity>
+        <activity android:name=".activities.TileActivity"></activity>
+        <activity android:name=".activities.RotationActivity"></activity>
+        <activity android:name=".activities.GraphActivity"></activity>
         <activity android:name=".activities.MainActivity"
             android:exported="true">
             <intent-filter>

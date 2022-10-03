@@ -29,5 +29,16 @@ public class MainActivity extends AppCompatActivity {
         Button region_button = findViewById(R.id.region_button);
         region_button.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, RegionActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP)));
 
+        Button class_button = findViewById(R.id.label_button);
+        class_button.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, LabelActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP)));
+
+        Button tile_button = findViewById(R.id.tile_button);
+        tile_button.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, TileActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP)));
+
+        Button rotation_button = findViewById(R.id.rotation_button);
+        rotation_button.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, RotationActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP)));
+
+        Button graph_button = findViewById(R.id.graph_button);
+        graph_button.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, GraphActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP)));
     }
 }

@@ -1,7 +1,12 @@
 package com.example.imagepro.activities;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.TextView;
 
+import com.example.imagepro.R;
 import com.example.imagepro.Tile;
 
 import org.opencv.android.CameraBridgeViewBase;
@@ -14,6 +19,14 @@ import org.opencv.imgproc.Imgproc;
 import java.util.List;
 
 public class RegionActivity extends DetectionActivity {
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        TextView title = findViewById(R.id.title_text);
+        title.setText(R.string.region);
+    }
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame){

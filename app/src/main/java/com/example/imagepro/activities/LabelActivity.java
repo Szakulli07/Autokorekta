@@ -1,7 +1,10 @@
 package com.example.imagepro.activities;
 
+import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
+import com.example.imagepro.R;
 import com.example.imagepro.Tile;
 
 import org.opencv.android.CameraBridgeViewBase;
@@ -13,7 +16,15 @@ import org.opencv.imgproc.Imgproc;
 
 import java.util.List;
 
-public class ClassActivity extends DetectionActivity {
+public class LabelActivity extends DetectionActivity {
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        TextView title = findViewById(R.id.title_text);
+        title.setText(R.string.label);
+    }
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame){

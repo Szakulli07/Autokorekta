@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">ImagePro</string>
-    <string name="region_button">Region</string>
-    <string name="class_button">Class</string>
-    <string name="tile_button">Tile</string>
-    <string name="rotation_button">Rotation</string>
-    <string name="graph_button">Graph</string>
+    <string name="region">Region</string>
+    <string name="label">Label</string>
+    <string name="title">Tile</string>
+    <string name="rotation">Rotation</string>
+    <string name="graph">Graph</string>
 
 </resources>
