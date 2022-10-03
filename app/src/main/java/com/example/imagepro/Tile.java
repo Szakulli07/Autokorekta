@@ -166,7 +166,7 @@ public class Tile {
     public void addNeighbour(Tile neighbour){
         float distance = this.getDistance(neighbour);
 
-        if(distance < this.size){ return;}
+        if(distance < this.size*0.1f){ return;}
 
         if(distance > this.size*1.2f){ return;}
 

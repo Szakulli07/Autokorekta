@@ -12,8 +12,7 @@ D
 Electric
 Electromagnetic anti-collision system
 Energy saving system
-Engine
-Hybrid
+EngineHybrid
 On-board computer
 Solar
 Sunroof

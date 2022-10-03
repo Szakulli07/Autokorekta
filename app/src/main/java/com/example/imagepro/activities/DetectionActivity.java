@@ -1,4 +1,4 @@
-package com.example.imagepro;
+package com.example.imagepro.activities;
 
 import android.Manifest;
 import android.app.Activity;
@@ -12,27 +12,26 @@ import android.view.WindowManager;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.imagepro.CarGame;
+import com.example.imagepro.R;
+import com.example.imagepro.Tile;
+
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
-import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
 
 import java.io.IOException;
 import java.util.List;
 
-public class CameraActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2{
-    private static final String TAG="MainActivity";
+public abstract class DetectionActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2{
+    protected static final String TAG="MainActivity";
 
-    private Mat mRgba;
-    private Mat mGray;
-    private CameraBridgeViewBase mOpenCvCameraView;
-    private CarGame carGame;
+    protected Mat mRgba;
+    protected CameraBridgeViewBase mOpenCvCameraView;
+    protected CarGame carGame;
     private final BaseLoaderCallback mLoaderCallback =new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
@@ -45,7 +44,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         }
     };
 
-    public CameraActivity(){
+    public DetectionActivity(){
         Log.i(TAG,"Instantiated new "+this.getClass());
     }
 
@@ -57,9 +56,9 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
         int MY_PERMISSIONS_REQUEST_CAMERA=0;
         // if camera permission is not given it will ask for it on device
-        if (ContextCompat.checkSelfPermission(CameraActivity.this, Manifest.permission.CAMERA)
+        if (ContextCompat.checkSelfPermission(DetectionActivity.this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_DENIED){
-            ActivityCompat.requestPermissions(CameraActivity.this, new String[] {Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
+            ActivityCompat.requestPermissions(DetectionActivity.this, new String[] {Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
         }
 
         setContentView(R.layout.activity_camera);
@@ -110,56 +109,14 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
     public void onCameraViewStarted(int width ,int height){
         mRgba=new Mat(height,width, CvType.CV_8UC4);
-        mGray=new Mat(height,width,CvType.CV_8UC1);
     }
 
     public void onCameraViewStopped(){
         mRgba.release();
     }
 
-    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame){
-        mRgba=inputFrame.rgba();
-        mGray=inputFrame.gray();
+    public abstract Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame);
 
-        List<Tile> tiles = this.carGame.getResults();
-
-        if(this.carGame.accessCarGame()){
-            Thread thread = new Thread() {
-                @Override
-                public void run(){
-                    carGame.computeResults(mRgba);
-                }
-            };
-            thread.start();
-        }
-
-        Log.d("PREDS", String.valueOf(tiles.size()));
-
-        return this.drawPredicts(mRgba, tiles);
-    }
-
-    private Mat drawPredicts(Mat in, List<Tile> tiles){
-
-        if(tiles.isEmpty()){
-            return  in;
-        }
-
-        // Rotate original image by 90 degree to get portrait frame
-        Mat out=new Mat();
-        Core.flip(in.t(), out, 1);
-
-        for(Tile tile: tiles){
-            for(Tile neighbourTile: tile.getNeighbours()){
-                Imgproc.line(out,
-                        new Point(tile.getCarPart().getCenterX(), tile.getCarPart().getCenterY()),
-                        new Point(neighbourTile.getCarPart().getCenterX(), neighbourTile.getCarPart().getCenterY()),
-                        new Scalar(255, 155, 155), 2);
-            }
-        }
-        // Rotate back by -90 degree
-        Core.flip(out.t(), out, 0);
-
-        return out;
-    }
+    protected abstract Mat drawPredicts(Mat in, List<Tile> tiles);
 
 }
