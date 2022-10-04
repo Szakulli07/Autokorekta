@@ -1,7 +1,6 @@
 package com.example.imagepro.activities;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.example.imagepro.R;
@@ -30,7 +29,7 @@ public class GraphActivity extends DetectionActivity {
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame){
         mRgba=inputFrame.rgba();
 
-        List<Tile> tiles = this.carGame.getResults();
+        List<Tile> tiles = this.carGame.getTiles();
 
         if(this.carGame.accessCarGame()){
             Thread thread = new Thread() {
@@ -42,12 +41,9 @@ public class GraphActivity extends DetectionActivity {
             thread.start();
         }
 
-        Log.d("PREDS", String.valueOf(tiles.size()));
-
         return this.drawPredicts(mRgba, tiles);
     }
 
-    @Override
     protected Mat drawPredicts(Mat in, List<Tile> tiles){
 
         if(tiles.isEmpty()){

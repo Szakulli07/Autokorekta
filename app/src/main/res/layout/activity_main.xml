@@ -14,11 +14,21 @@
     tools:context=".activities.MainActivity">
 
     <Button
+        android:id="@+id/region_button"
+        android:text="@string/region"
+        android:layout_row="0"
+        android:layout_rowWeight="1"
+        android:layout_column="0"
+        android:layout_columnWeight="1"
+        android:backgroundTint="@color/green"
+        />
+
+    <Button
         android:id="@+id/label_button"
         android:text="@string/label"
         android:layout_row="0"
         android:layout_rowWeight="1"
-        android:layout_column="0"
+        android:layout_column="1"
         android:layout_columnWeight="1"
         android:backgroundTint="@color/red"
         />
@@ -26,21 +36,11 @@
     <Button
         android:id="@+id/tile_button"
         android:text="@string/title"
-        android:layout_row="0"
-        android:layout_column="1"
+        android:layout_row="1"
+        android:layout_column="0"
         android:layout_columnWeight="1"
         android:layout_rowWeight="1"
         android:backgroundTint="@color/blue"
-        />
-
-    <Button
-        android:id="@+id/region_button"
-        android:text="@string/region"
-        android:layout_row="1"
-        android:layout_rowWeight="1"
-        android:layout_column="0"
-        android:layout_columnWeight="1"
-        android:backgroundTint="@color/green"
         />
 
     <Button

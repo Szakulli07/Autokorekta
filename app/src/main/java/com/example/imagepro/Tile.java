@@ -1,7 +1,5 @@
 package com.example.imagepro;
 
-import android.service.autofill.FillEventHistory;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,11 +9,12 @@ public class Tile {
     private boolean isHybrid;
     private boolean isSolar;
 
-    public float size=0;
 
     private final List<Prediction> carTypes;
     private List<Tile> neighbours = new ArrayList<>();
     private final Prediction carPart;
+
+    private float size=0;
     private Rotation rotation;
 
     public Tile(Prediction carPart, List<Prediction> carTypes) {
@@ -149,6 +148,10 @@ public class Tile {
         }else{
             return Rotation.UPPER;
         }
+    }
+
+    public float getSize(){
+        return this.size;
     }
 
     private void setSize(){

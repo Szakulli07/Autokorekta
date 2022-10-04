@@ -39,8 +39,12 @@ public class CarGame {
         this.changeDetecting(false);
     }
 
-    public List<Tile> getResults(){
+    public List<Tile> getTiles(){
         return tileDetector.getTiles();
     }
+    public List<Prediction> getPredictions(){
+        return objectDetector.getPredicts();
+    }
+
 }
 

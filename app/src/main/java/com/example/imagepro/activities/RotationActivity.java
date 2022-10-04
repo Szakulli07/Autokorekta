@@ -1,7 +1,6 @@
 package com.example.imagepro.activities;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.example.imagepro.R;
@@ -30,7 +29,7 @@ public class RotationActivity extends DetectionActivity {
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame){
         mRgba=inputFrame.rgba();
 
-        List<Tile> tiles = this.carGame.getResults();
+        List<Tile> tiles = this.carGame.getTiles();
 
         if(this.carGame.accessCarGame()){
             Thread thread = new Thread() {
@@ -42,12 +41,9 @@ public class RotationActivity extends DetectionActivity {
             thread.start();
         }
 
-        Log.d("PREDS", String.valueOf(tiles.size()));
-
         return this.drawPredicts(mRgba, tiles);
     }
 
-    @Override
     protected Mat drawPredicts(Mat in, List<Tile> tiles){
 
         if(tiles.isEmpty()){
@@ -59,12 +55,11 @@ public class RotationActivity extends DetectionActivity {
         Core.flip(in.t(), out, 1);
 
         for(Tile tile: tiles){
-            for(Tile neighbourTile: tile.getNeighbours()){
-                Imgproc.line(out,
-                        new Point(tile.getCarPart().getCenterX(), tile.getCarPart().getCenterY()),
-                        new Point(neighbourTile.getCarPart().getCenterX(), neighbourTile.getCarPart().getCenterY()),
-                        new Scalar(255, 155, 155), 2);
-            }
+            Imgproc.putText(out, tile.getRotation().toString(),
+                    new Point(tile.getCarPart().getCenterX() - tile.getSize()/2f, tile.getCarPart().getCenterY() + tile.getSize()/2),
+                    Core.FONT_HERSHEY_SIMPLEX,
+                    0.75f, new Scalar(255, 155, 155), 2);
+
         }
         // Rotate back by -90 degree
         Core.flip(out.t(), out, 0);

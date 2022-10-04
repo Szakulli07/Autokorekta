@@ -1,13 +1,10 @@
 package com.example.imagepro.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.imagepro.Prediction;
 import com.example.imagepro.R;
-import com.example.imagepro.Tile;
 
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.Core;
@@ -32,7 +29,7 @@ public class RegionActivity extends DetectionActivity {
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame){
         mRgba=inputFrame.rgba();
 
-        List<Tile> tiles = this.carGame.getResults();
+        List<Prediction> predictions = this.carGame.getPredictions();
 
         if(this.carGame.accessCarGame()){
             Thread thread = new Thread() {
@@ -44,15 +41,12 @@ public class RegionActivity extends DetectionActivity {
             thread.start();
         }
 
-        Log.d("PREDS", String.valueOf(tiles.size()));
-
-        return this.drawPredicts(mRgba, tiles);
+        return this.drawPredicts(mRgba, predictions);
     }
 
-    @Override
-    protected Mat drawPredicts(Mat in, List<Tile> tiles){
+    protected Mat drawPredicts(Mat in, List<Prediction> predictions){
 
-        if(tiles.isEmpty()){
+        if(predictions.isEmpty()){
             return  in;
         }
 
@@ -60,13 +54,11 @@ public class RegionActivity extends DetectionActivity {
         Mat out=new Mat();
         Core.flip(in.t(), out, 1);
 
-        for(Tile tile: tiles){
-            for(Tile neighbourTile: tile.getNeighbours()){
-                Imgproc.line(out,
-                        new Point(tile.getCarPart().getCenterX(), tile.getCarPart().getCenterY()),
-                        new Point(neighbourTile.getCarPart().getCenterX(), neighbourTile.getCarPart().getCenterY()),
+        for(Prediction prediction: predictions){
+            Imgproc.rectangle(out,
+                        new Point(prediction.getLeftX(), prediction.getDownY()),
+                        new Point(prediction.getRightX(), prediction.getUpperY()),
                         new Scalar(255, 155, 155), 2);
-            }
         }
         // Rotate back by -90 degree
         Core.flip(out.t(), out, 0);

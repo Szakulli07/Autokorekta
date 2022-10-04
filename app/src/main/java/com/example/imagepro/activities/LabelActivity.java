@@ -1,9 +1,9 @@
 package com.example.imagepro.activities;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
+import com.example.imagepro.Prediction;
 import com.example.imagepro.R;
 import com.example.imagepro.Tile;
 
@@ -30,7 +30,7 @@ public class LabelActivity extends DetectionActivity {
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame){
         mRgba=inputFrame.rgba();
 
-        List<Tile> tiles = this.carGame.getResults();
+        List<Prediction> predictions = this.carGame.getPredictions();
 
         if(this.carGame.accessCarGame()){
             Thread thread = new Thread() {
@@ -42,15 +42,12 @@ public class LabelActivity extends DetectionActivity {
             thread.start();
         }
 
-        Log.d("PREDS", String.valueOf(tiles.size()));
-
-        return this.drawPredicts(mRgba, tiles);
+        return this.drawPredicts(mRgba, predictions);
     }
 
-    @Override
-    protected Mat drawPredicts(Mat in, List<Tile> tiles){
+    protected Mat drawPredicts(Mat in, List<Prediction> predictions){
 
-        if(tiles.isEmpty()){
+        if(predictions.isEmpty()){
             return  in;
         }
 
@@ -58,13 +55,11 @@ public class LabelActivity extends DetectionActivity {
         Mat out=new Mat();
         Core.flip(in.t(), out, 1);
 
-        for(Tile tile: tiles){
-            for(Tile neighbourTile: tile.getNeighbours()){
-                Imgproc.line(out,
-                        new Point(tile.getCarPart().getCenterX(), tile.getCarPart().getCenterY()),
-                        new Point(neighbourTile.getCarPart().getCenterX(), neighbourTile.getCarPart().getCenterY()),
-                        new Scalar(255, 155, 155), 2);
-            }
+        for(Prediction prediction: predictions){
+            Imgproc.putText(out, prediction.getLabel().toString(),
+                    new Point(prediction.getLeftX(), prediction.getCenterY()),
+                    Core.FONT_HERSHEY_SIMPLEX,
+                    0.5f, new Scalar(255, 155, 155), 2);
         }
         // Rotate back by -90 degree
         Core.flip(out.t(), out, 0);

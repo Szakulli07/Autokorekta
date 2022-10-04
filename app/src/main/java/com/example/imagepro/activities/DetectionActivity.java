@@ -117,6 +117,4 @@ public abstract class DetectionActivity extends Activity implements CameraBridge
 
     public abstract Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame);
 
-    protected abstract Mat drawPredicts(Mat in, List<Tile> tiles);
-
 }
