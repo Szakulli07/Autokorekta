@@ -22,8 +22,10 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class DetectionActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2{
@@ -32,6 +34,16 @@ public abstract class DetectionActivity extends Activity implements CameraBridge
     protected Mat mRgba;
     protected CameraBridgeViewBase mOpenCvCameraView;
     protected CarGame carGame;
+
+    protected List<Scalar> colors = Arrays.asList(
+            new Scalar(232, 39, 39),
+            new Scalar(20, 149, 236),
+            new Scalar(132, 225, 25),
+            new Scalar(244, 218, 35),
+            new Scalar(223, 121, 11)
+    );
+
+
     private final BaseLoaderCallback mLoaderCallback =new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {

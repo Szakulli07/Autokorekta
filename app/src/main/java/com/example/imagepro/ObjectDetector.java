@@ -12,10 +12,8 @@ import org.tensorflow.lite.Interpreter;
 import org.tensorflow.lite.gpu.CompatibilityList;
 import org.tensorflow.lite.gpu.GpuDelegate;
 
-import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
@@ -77,6 +75,15 @@ public class ObjectDetector {
                 .collect(Collectors.partitioningBy(Prediction::isTeamLabel));
         this.teamPredicts = partitions.get(true);
         this.predicts = partitions.get(false);
+        if(this.predicts != null)
+            this.predicts.sort(
+                    (p1, p2) -> {
+                        if(Float.compare(p1.getCenterX(), p2.getCenterX()) == 0){
+                            return Float.compare(p1.getCenterX(), p2.getCenterX());
+                        }else{
+                            return Float.compare(p1.getCenterY(), p2.getCenterY());
+                        }
+                    } );
     }
 
     public void recognizeImage(Mat mat_image) {

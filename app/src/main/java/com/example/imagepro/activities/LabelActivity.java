@@ -14,6 +14,7 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class LabelActivity extends DetectionActivity {
@@ -55,11 +56,19 @@ public class LabelActivity extends DetectionActivity {
         Mat out=new Mat();
         Core.flip(in.t(), out, 1);
 
+        Iterator colorIterator = colors.iterator();
+
         for(Prediction prediction: predictions){
+
+            if(!colorIterator.hasNext())
+                colorIterator = colors.iterator();
+
+            Scalar color = (Scalar)colorIterator.next();
+
             Imgproc.putText(out, prediction.getLabel().toString(),
                     new Point(prediction.getLeftX(), prediction.getCenterY()),
                     Core.FONT_HERSHEY_SIMPLEX,
-                    0.5f, new Scalar(255, 155, 155), 2);
+                    0.5f, color, 2);
         }
         // Rotate back by -90 degree
         Core.flip(out.t(), out, 0);

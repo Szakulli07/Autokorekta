@@ -13,6 +13,7 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class TileActivity extends DetectionActivity {
@@ -54,11 +55,19 @@ public class TileActivity extends DetectionActivity {
         Mat out=new Mat();
         Core.flip(in.t(), out, 1);
 
+        Iterator colorIterator = colors.iterator();
+
         for(Tile tile: tiles){
+
+            if(!colorIterator.hasNext())
+                colorIterator = colors.iterator();
+
+            Scalar color = (Scalar)colorIterator.next();
+
             Imgproc.rectangle(out,
                     new Point(tile.getCarPart().getCenterX() - tile.getSize()/2f, tile.getCarPart().getCenterY() - tile.getSize()/2f),
                     new Point(tile.getCarPart().getCenterX() + tile.getSize()/2f, tile.getCarPart().getCenterY() + tile.getSize()/2f),
-                    new Scalar(255, 155, 155), 2);
+                    color, 2);
         }
         // Rotate back by -90 degree
         Core.flip(out.t(), out, 0);

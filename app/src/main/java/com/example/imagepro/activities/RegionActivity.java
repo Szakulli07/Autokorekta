@@ -13,6 +13,7 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class RegionActivity extends DetectionActivity {
@@ -53,12 +54,20 @@ public class RegionActivity extends DetectionActivity {
         // Rotate original image by 90 degree to get portrait frame
         Mat out=new Mat();
         Core.flip(in.t(), out, 1);
+        
+        Iterator colorIterator = colors.iterator();
 
         for(Prediction prediction: predictions){
+
+            if(!colorIterator.hasNext())
+                colorIterator = colors.iterator();
+
+            Scalar color = (Scalar)colorIterator.next();
+
             Imgproc.rectangle(out,
                         new Point(prediction.getLeftX(), prediction.getDownY()),
                         new Point(prediction.getRightX(), prediction.getUpperY()),
-                        new Scalar(255, 155, 155), 2);
+                        color, 2);
         }
         // Rotate back by -90 degree
         Core.flip(out.t(), out, 0);
