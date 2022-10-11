@@ -30,6 +30,7 @@
         <activity android:name=".activities.TileActivity"></activity>
         <activity android:name=".activities.RotationActivity"></activity>
         <activity android:name=".activities.GraphActivity"></activity>
+        <activity android:name=".activities.CarActivity"></activity>
         <activity android:name=".activities.MainActivity"
             android:exported="true">
             <intent-filter>

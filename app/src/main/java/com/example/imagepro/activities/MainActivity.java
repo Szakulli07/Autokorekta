@@ -40,5 +40,8 @@ public class MainActivity extends AppCompatActivity {
 
         Button graph_button = findViewById(R.id.graph_button);
         graph_button.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, GraphActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP)));
+
+        Button car_button = findViewById(R.id.car_button);
+        car_button.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, CarActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP)));
     }
 }

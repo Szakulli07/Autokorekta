@@ -1,9 +1,11 @@
 package com.example.imagepro;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode
 public enum Label {
     A_TEAM,
     AUTOMATIC_STEERING,

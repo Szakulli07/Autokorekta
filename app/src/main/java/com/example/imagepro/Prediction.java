@@ -3,7 +3,9 @@ package com.example.imagepro;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode
 public class Prediction {
     private final float centerX;
     private float leftX;

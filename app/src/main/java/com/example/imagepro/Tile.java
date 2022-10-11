@@ -2,13 +2,12 @@ package com.example.imagepro;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode
 public class Tile {
-    private boolean isBiofuel;
-    private boolean isElectric;
-    private boolean isHybrid;
-    private boolean isSolar;
-
 
     private final List<Prediction> carTypes;
     private List<Tile> neighbours = new ArrayList<>();
@@ -178,5 +177,15 @@ public class Tile {
 
     public List<Tile> getNeighbours(){
         return this.neighbours;
+    }
+
+    public Label getCarType(){
+        List<Prediction> notEmptyTiles = this.carTypes.stream()
+                .filter(ct -> ct.getLabel() != Label.BLANK).collect(Collectors.toList());
+        if(notEmptyTiles.size() != 1){
+            return Label.BLANK;
+        }else{
+            return notEmptyTiles.get(0).getLabel();
+        }
     }
 }

@@ -10,6 +10,7 @@ import java.util.List;
 public class CarGame {
     private final ObjectDetector  objectDetector;
     private final TileDetector tileDetector = new TileDetector();
+    private final CarDetector carDetector = new CarDetector();
     private boolean isDetecting = false;
 
 
@@ -35,7 +36,11 @@ public class CarGame {
     public void computeResults(Mat frame){
         this.objectDetector.recognizeImage(frame);
         List<Prediction> predictions = this.objectDetector.getPredicts();
+
         this.tileDetector.detectTiles(predictions);
+        List<Tile> tiles = this.tileDetector.getTiles();
+
+        this.carDetector.detectCars(tiles);
         this.changeDetecting(false);
     }
 
@@ -45,6 +50,7 @@ public class CarGame {
     public List<Prediction> getPredictions(){
         return objectDetector.getPredicts();
     }
+    public List<Tile> getCars() { return  carDetector.getCars(); }
 
 }
 
