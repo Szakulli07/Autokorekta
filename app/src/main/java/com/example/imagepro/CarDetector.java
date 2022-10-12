@@ -1,9 +1,13 @@
 package com.example.imagepro;
 
-import android.util.Log;
+import com.example.imagepro.cars.BiofuelCar;
+import com.example.imagepro.cars.BlankCar;
+import com.example.imagepro.cars.Car;
+import com.example.imagepro.cars.ElectricCar;
+import com.example.imagepro.cars.HybridCar;
+import com.example.imagepro.cars.SolarCar;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,31 +31,55 @@ public class CarDetector {
         Map<Boolean, List<Tile>> partitions = tiles.stream()
                 .collect(Collectors.partitioningBy(tile -> tile.getCarPart().getLabel() == Label.CHASSIS));
 
-        if(partitions.get(true) != null){
-            Queue<Tile> startTiles = new LinkedList<>(partitions.get(true));
-            List<Tile> otherTiles = partitions.get(false);
-
-            Map<Tile, Boolean> seenPoints = new HashMap<>();
-            for (Tile tile: tiles) {
-                seenPoints.put(tile, Boolean.FALSE);
-            }
-
-            this.carBFS(startTiles, seenPoints);
+        if(partitions.get(true) == null) {
+            return;
         }
+
+        Queue<Tile> startTiles = new LinkedList<>(partitions.get(true));
+
+        Map<Tile, Boolean> seenPoints = new HashMap<>();
+        for (Tile tile: tiles) {
+            seenPoints.put(tile, Boolean.FALSE);
+        }
+
+        List<Car> beforeRotationCars = this.carBFS(startTiles, seenPoints);
 
         this.setCars(tiles);
     }
 
-    private void carBFS(Queue<Tile> startPoints, Map<Tile, Boolean> seenPoints){
-        Log.d("CAR", "START BFS");
+    private List<Car> carBFS(Queue<Tile> startPoints, Map<Tile, Boolean> seenPoints){
+        List<Car> cars = new ArrayList<>();
 
         while (!startPoints.isEmpty()){
-            Queue<Tile> carQueue = new LinkedList<>(Collections.singleton(startPoints.poll()));
+            Tile startPoint = startPoints.poll();
+            Car car;
+
+            switch (startPoint.getCarType()){
+                case BIOFUEL:
+                    car = new BiofuelCar(startPoint);
+                    break;
+                case HYBRID:
+                    car = new HybridCar(startPoint);
+                    break;
+                case ELECTRIC:
+                    car = new ElectricCar(startPoint);
+                    break;
+                case SOLAR:
+                    car = new SolarCar(startPoint);
+                    break;
+                default:
+                    car = new BlankCar(startPoint);
+                    break;
+            }
+
+            Queue<Tile> carQueue = new LinkedList<>();
+
+            if(startPoint.getCarType() != Label.BLANK){
+                carQueue.add(startPoint);
+            }
 
             while(!carQueue.isEmpty()){
                 Tile tile = carQueue.poll();
-                Log.d("CAR", tile.getCarPart().getLabel().toString());
-
                 seenPoints.put(tile, Boolean.TRUE);
 
                 for (Tile neighbourTile: tile.getNeighbours()) {
@@ -59,11 +87,18 @@ public class CarDetector {
                     if(!seenPoints.get(neighbourTile)
                             && neighbourTile.getRotation() == tile.getRotation()
                             && neighbourTile.getCarType() == tile.getCarType()){
-                        seenPoints.put(neighbourTile, Boolean.TRUE);
+                        seenPoints.replace(neighbourTile, Boolean.TRUE);
                         carQueue.add(neighbourTile);
+                        car.addTile(neighbourTile);
                     }
                 }
             }
+
+            if(car.isValid()){
+                cars.add(car);
+            }
         }
+
+        return cars;
     }
 }

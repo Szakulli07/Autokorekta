@@ -44,6 +44,13 @@ public enum Label {
             Label.SOLAR
     );
 
+    private static final List<Label> mainLabels = Arrays.asList(
+            Label.CHASSIS,
+            Label.ENGINE,
+            Label.BODY,
+            Label.ON_BOARD_COMPUTER
+    );
+
     public static final Label getLabelFromId(final int id){
         return values.get(id);
     }
@@ -64,6 +71,15 @@ public enum Label {
 
     public static final boolean isLabelTeam(final Label label){
         return Label.teamLabels.contains(label);
+    }
+
+    public static final boolean isIdMain(final int id){
+        Label label = Label.getLabelFromId(id);
+        return Label.isLabelMain(label);
+    }
+
+    public static final boolean isLabelMain(final Label label){
+        return Label.mainLabels.contains(label);
     }
 
     public static final int getPossibleTypeCountFromId(final int id){
