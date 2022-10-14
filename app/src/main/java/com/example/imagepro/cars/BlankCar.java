@@ -3,10 +3,22 @@ package com.example.imagepro.cars;
 import com.example.imagepro.Label;
 import com.example.imagepro.Tile;
 
+import org.opencv.core.Scalar;
+
 public class BlankCar extends Car{
 
     public BlankCar(Tile startingTile){
         super(startingTile);
+    }
+
+    @Override
+    public String getName() {
+        return "Err";
+    }
+
+    @Override
+    public Scalar getColor() {
+        return new Scalar(255, 255, 255);
     }
 
     @Override

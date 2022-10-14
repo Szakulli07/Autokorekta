@@ -51,43 +51,64 @@ public enum Label {
             Label.ON_BOARD_COMPUTER
     );
 
-    public static final Label getLabelFromId(final int id){
+    public static Label getLabelFromId(final int id){
         return values.get(id);
     }
 
-    public static final boolean isIdSmall(final int id){
+    public static boolean isIdSmall(final int id){
         Label label = Label.getLabelFromId(id);
         return Label.isLabelSmall(label);
     }
 
-    public static final boolean isLabelSmall(final Label label){
+    public static boolean isLabelSmall(final Label label){
         return Label.smallLabels.contains(label);
     }
 
-    public static final boolean isIdTeam(final int id){
+    public static boolean isIdTeam(final int id){
         Label label = Label.getLabelFromId(id);
         return Label.isLabelTeam(label);
     }
 
-    public static final boolean isLabelTeam(final Label label){
+    public static boolean isLabelTeam(final Label label){
         return Label.teamLabels.contains(label);
     }
 
-    public static final boolean isIdMain(final int id){
+    public static boolean isIdMain(final int id){
         Label label = Label.getLabelFromId(id);
         return Label.isLabelMain(label);
     }
 
-    public static final boolean isLabelMain(final Label label){
+    public static boolean isLabelMain(final Label label){
         return Label.mainLabels.contains(label);
     }
 
-    public static final int getPossibleTypeCountFromId(final int id){
+    public static Label labelGroup(final Label label){
+        switch (label){
+            case CHASSIS:
+            case ENERGY_SAVING_SYSTEM:
+                return CHASSIS;
+            case ENGINE:
+            case BATTERY:
+                return ENGINE;
+            case BODY:
+            case SUNROOF:
+                return BODY;
+            case ON_BOARD_COMPUTER:
+            case ELECTROMAGNETIC_ANTI_COLLISION_SYSTEM:
+            case CONTROL_PANEL:
+            case AUTOMATIC_STEERING:
+                return ON_BOARD_COMPUTER;
+            default:
+                return BLANK;
+        }
+    }
+
+    public static int getPossibleTypeCountFromId(final int id){
         Label label = Label.getLabelFromId(id);
         return Label.getPossibleTypeCountFromLabel(label);
     }
 
-    public static final int getPossibleTypeCountFromLabel(final Label label){
+    public static int getPossibleTypeCountFromLabel(final Label label){
         if(Label.isLabelTeam(label)){
             return -1;
         }else if(Label.isLabelSmall(label)){

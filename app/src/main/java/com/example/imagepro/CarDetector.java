@@ -17,13 +17,13 @@ import java.util.stream.Collectors;
 
 public class CarDetector {
 
-    private List<Tile> cars = new ArrayList<>();
+    private List<Car> cars = new ArrayList<>();
 
-    public List<Tile> getCars() {
+    public List<Car> getCars() {
         return cars;
     }
 
-    public void setCars(List<Tile> cars) {
+    public void setCars(List<Car> cars) {
         this.cars = cars;
     }
 
@@ -44,7 +44,7 @@ public class CarDetector {
 
         List<Car> beforeRotationCars = this.carBFS(startTiles, seenPoints);
 
-        this.setCars(tiles);
+        this.setCars(beforeRotationCars);
     }
 
     private List<Car> carBFS(Queue<Tile> startPoints, Map<Tile, Boolean> seenPoints){
@@ -94,9 +94,7 @@ public class CarDetector {
                 }
             }
 
-            if(car.isValid()){
-                cars.add(car);
-            }
+            cars.add(car);
         }
 
         return cars;

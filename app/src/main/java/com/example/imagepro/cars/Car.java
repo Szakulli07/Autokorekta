@@ -4,6 +4,12 @@ import com.example.imagepro.Label;
 import com.example.imagepro.Rotation;
 import com.example.imagepro.Tile;
 
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,6 +23,8 @@ public abstract class Car {
 
     List<Tile> tiles = new ArrayList<>();
     List<Label> neededLabels = new ArrayList<>();
+    String drawType = "C";
+    Scalar drawColor = new Scalar(255, 0, 0);
 
     public Car(Tile startingTile){
         this.tiles.add(startingTile);
@@ -61,7 +69,8 @@ public abstract class Car {
                     return distance.get(tile)+1;
                 }
 
-                if(!seenTiles.get(neighbourTile)){
+                if(!seenTiles.get(neighbourTile) &&
+                    Label.labelGroup(neighbourTile.getCarPart().getLabel()) == Label.labelGroup(tile.getCarPart().getLabel())){
                     seenTiles.replace(neighbourTile, Boolean.TRUE);
                     distance.replace(neighbourTile, distance.get(tile)+1);
                     carQueue.add(neighbourTile);
@@ -84,7 +93,54 @@ public abstract class Car {
         return tileLabels.containsAll(neededLabels);
     }
 
+    public Mat draw(Mat in){
+        Mat out=new Mat();
+
+        Core.flip(in.t(), out, 1);
+
+        String rotation = "";
+
+        switch (this.getRotation()){
+            case DOWN:
+                rotation = "D";
+                break;
+            case UPPER:
+                rotation = "U";
+                break;
+            case LEFT:
+                rotation = "L";
+                break;
+            case RIGHT:
+                rotation = "R";
+                break;
+            case ERROR:
+                rotation = "E";
+                break;
+        }
+
+        Scalar color = new Scalar(255, 0, 0);
+
+        if(this.isValid()){
+            color = this.getColor();
+
+        }
+
+        for (Tile tile: tiles) {
+            Imgproc.putText(out, rotation + "_" + this.getName(),
+                    new Point(tile.getCarPart().getCenterX() - tile.getSize()/2f, tile.getCarPart().getCenterY()),
+                    Core.FONT_HERSHEY_SIMPLEX,
+                    0.75f, color, 2);
+        }
+
+        Core.flip(out.t(), out, 0);
+
+        return out;
+    }
 
     public abstract void addTile(Tile tile);
+
+    public abstract String getName();
+
+    public abstract Scalar getColor();
 
 }

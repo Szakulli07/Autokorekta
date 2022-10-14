@@ -1,7 +1,10 @@
 package com.example.imagepro.cars;
 
 import com.example.imagepro.Label;
+import com.example.imagepro.R;
 import com.example.imagepro.Tile;
+
+import org.opencv.core.Scalar;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,6 +32,16 @@ public class BiofuelCar extends Car{
     }
 
     @Override
+    public String getName() {
+        return "Bio";
+    }
+
+    @Override
+    public Scalar getColor() {
+        return new Scalar(232, 39, 177);
+    }
+
+    @Override
     public  boolean isValid(){
         if(neededLabels.size() != tiles.size()){
             return false;
@@ -42,17 +55,21 @@ public class BiofuelCar extends Car{
             return false;
         }
 
-        if(this.checkDistance(Label.CHASSIS, Label.ENGINE) != 1){
-            return  false;
-        }
+        int distanceAB;
+        int distanceBA = 0;
 
-        if(this.checkDistance(Label.ENGINE, Label.BODY) != 1){
-            return  false;
-        }
 
-        if(this.checkDistance(Label.BODY, Label.ON_BOARD_COMPUTER) != 1){
-            return  false;
-        }
+        distanceAB = this.checkDistance(Label.CHASSIS, Label.ENGINE);
+        distanceBA = this.checkDistance(Label.ENGINE, Label.CHASSIS);
+        if( (distanceAB < 0 || distanceAB > 2) && (distanceBA < 0 || distanceBA >2) ){ return  false; }
+
+        distanceAB = this.checkDistance(Label.ENGINE, Label.BODY);
+        distanceBA = this.checkDistance(Label.BODY, Label.ENGINE);
+        if( (distanceAB < 0 || distanceAB > 2) && (distanceBA < 0 || distanceBA >2) ){ return  false; }
+
+        distanceAB = this.checkDistance(Label.BODY, Label.ON_BOARD_COMPUTER);
+        distanceBA = this.checkDistance(Label.ON_BOARD_COMPUTER, Label.BODY);
+        if( (distanceAB < 0 || distanceAB > 2) && (distanceBA < 0 || distanceBA >2) ){ return  false; }
 
         return true;
     }

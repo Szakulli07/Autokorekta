@@ -2,6 +2,8 @@ package com.example.imagepro;
 
 import android.content.res.AssetManager;
 
+import com.example.imagepro.cars.Car;
+
 import org.opencv.core.Mat;
 
 import java.io.IOException;
@@ -50,7 +52,7 @@ public class CarGame {
     public List<Prediction> getPredictions(){
         return objectDetector.getPredicts();
     }
-    public List<Tile> getCars() { return  carDetector.getCars(); }
+    public List<Car> getCars() { return  carDetector.getCars(); }
 
 }
 

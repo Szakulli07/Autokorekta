@@ -68,7 +68,8 @@ public class GraphActivity extends DetectionActivity {
 
                 Imgproc.line(out,
                         new Point(tile.getCarPart().getCenterX(), tile.getCarPart().getCenterY()),
-                        new Point(neighbourTile.getCarPart().getCenterX(), neighbourTile.getCarPart().getCenterY()),
+                        new Point((neighbourTile.getCarPart().getCenterX()+tile.getCarPart().getCenterX())/2,
+                                (neighbourTile.getCarPart().getCenterY()+tile.getCarPart().getCenterY())/2),
                         color, 2);
             }
         }

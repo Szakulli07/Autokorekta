@@ -170,7 +170,18 @@ public class Tile {
 
         if(distance < this.size*0.1f){ return;}
 
-        if(distance > this.size*1.2f){ return;}
+        switch (this.getCarPart().getLabel()){
+            case AUTOMATIC_STEERING:
+                if(distance > this.size*1.4f){ return;}
+                break;
+            case ENERGY_SAVING_SYSTEM:
+            case ELECTROMAGNETIC_ANTI_COLLISION_SYSTEM:
+                if(distance > this.size*1.6f){ return;}
+                break;
+            default:
+                if(distance > this.size*1.25f){ return;}
+                break;
+        }
 
         this.neighbours.add(neighbour);
     }

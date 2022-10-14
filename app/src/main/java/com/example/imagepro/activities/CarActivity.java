@@ -5,6 +5,7 @@ import android.widget.TextView;
 
 import com.example.imagepro.R;
 import com.example.imagepro.Tile;
+import com.example.imagepro.cars.Car;
 
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.Core;
@@ -30,7 +31,7 @@ public class CarActivity extends DetectionActivity {
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame){
         mRgba=inputFrame.rgba();
 
-        List<Tile> tiles = this.carGame.getCars();
+        List<Car> cars = this.carGame.getCars();
 
         if(this.carGame.accessCarGame()){
             Thread thread = new Thread() {
@@ -42,36 +43,22 @@ public class CarActivity extends DetectionActivity {
             thread.start();
         }
 
-        return this.drawPredicts(mRgba, tiles);
+        return this.drawPredicts(mRgba, cars);
     }
 
-    protected Mat drawPredicts(Mat in, List<Tile> tiles){
+    protected Mat drawPredicts(Mat in, List<Car> cars){
 
-        if(tiles.isEmpty()){
+        if(cars.isEmpty()){
             return  in;
         }
 
-        // Rotate original image by 90 degree to get portrait frame
-        Mat out=new Mat();
-        Core.flip(in.t(), out, 1);
+        Mat out= new Mat();
+        in.copyTo(out);
 
-        Iterator colorIterator = colors.iterator();
-
-        for(Tile tile: tiles){
-
-            if(!colorIterator.hasNext())
-                colorIterator = colors.iterator();
-
-            Scalar color = (Scalar)colorIterator.next();
-
-            Imgproc.putText(out, tile.getRotation().toString(),
-                    new Point(tile.getCarPart().getCenterX() - tile.getSize()/2f, tile.getCarPart().getCenterY() + tile.getSize()/2),
-                    Core.FONT_HERSHEY_SIMPLEX,
-                    0.75f, color, 2);
+        for(Car car: cars){
+            out = car.draw(out);
 
         }
-        // Rotate back by -90 degree
-        Core.flip(out.t(), out, 0);
 
         return out;
     }
