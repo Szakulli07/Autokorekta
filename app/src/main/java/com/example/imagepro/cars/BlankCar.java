@@ -15,9 +15,14 @@ public class BlankCar extends Car{
 
     List<Label> neededLabels = Arrays.asList();
 
+    private Boolean isValid = null;
+
     public BlankCar(Tile startingTile){
         this.tiles.add(startingTile);
     }
+
+    @Override
+    public Label getType(){ return Label.BLANK;}
 
     @Override
     public String getName() {

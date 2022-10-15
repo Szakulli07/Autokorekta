@@ -22,10 +22,15 @@ public class NewHybridCar extends Car {
             Label.ENGINE
     );
 
+    private Boolean isValid = null;
+
+
     public NewHybridCar(Tile startingTile){
         this.tiles.add(startingTile);
     }
 
+    @Override
+    public Label getType(){ return Label.HYBRID;}
 
     @Override
     public String getName() {
@@ -56,7 +61,13 @@ public class NewHybridCar extends Car {
 
     @Override
     public  boolean isValid(){
+
+        if(this.isValid != null){
+            return this.isValid;
+        }
+
         if(neededLabels.size() != tiles.size()){
+            this.isValid = false;
             return false;
         }
 
@@ -65,12 +76,14 @@ public class NewHybridCar extends Car {
                 .collect(Collectors.toList());
 
         if(!tileLabels.containsAll(neededLabels)){
+            this.isValid = false;
             return false;
         }
 
         for (Tile tile: tiles) {
             if(!(tile.getLabel() == Label.HYBRID || tile.getLabel() == Label.BIO_HYBRID)
-                || !tile.isNewTechnology()){
+                    || !tile.isNewTechnology()){
+                this.isValid = false;
                 return false;
             }
         }
@@ -78,14 +91,21 @@ public class NewHybridCar extends Car {
         int distance;
 
         distance = this.checkDistance(Label.CHASSIS, Label.ENGINE);
-        if( distance != 1 ){ return  false; }
+        if( distance != 1 ){
+            this.isValid = false;
+            return  false; }
 
         distance = this.checkDistance(Label.ENGINE, Label.BODY);
-        if( distance != 1 ){ return  false; }
+        if( distance != 1 ){
+            this.isValid = false;
+            return  false; }
 
         distance = this.checkDistance(Label.BODY, Label.ON_BOARD_COMPUTER);
-        if( distance != 1 ){ return  false; }
+        if( distance != 1 ){
+            this.isValid = false;
+            return  false; }
 
+        this.isValid = true;
         return true;
     }
 

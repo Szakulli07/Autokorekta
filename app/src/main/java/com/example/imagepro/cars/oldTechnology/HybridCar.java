@@ -24,9 +24,14 @@ public class HybridCar extends Car {
             Label.BATTERY
     );
 
+    private Boolean isValid = null;
+
     public HybridCar(Tile startingTile){
         this.tiles.add(startingTile);
     }
+
+    @Override
+    public Label getType(){ return Label.HYBRID;}
 
     @Override
     public String getName() {
@@ -57,7 +62,13 @@ public class HybridCar extends Car {
 
     @Override
     public  boolean isValid(){
+
+        if(this.isValid != null){
+            return this.isValid;
+        }
+
         if(neededLabels.size() != tiles.size()){
+            this.isValid = false;
             return false;
         }
 
@@ -66,12 +77,14 @@ public class HybridCar extends Car {
                 .collect(Collectors.toList());
 
         if(!tileLabels.containsAll(neededLabels)){
+            this.isValid = false;
             return false;
         }
 
         for (Tile tile: tiles) {
             if(tile.getLabel() != Label.HYBRID
                     || tile.isNewTechnology()){
+                this.isValid = false;
                 return false;
             }
         }
@@ -82,22 +95,33 @@ public class HybridCar extends Car {
 
         distanceAB = this.checkDistance(Label.CHASSIS, Label.ENGINE);
         distanceBA = this.checkDistance(Label.ENGINE, Label.CHASSIS);
-        if( (distanceAB < 0 || distanceAB > 2) && (distanceBA < 0 || distanceBA >2) ){ return  false; }
+        if( (distanceAB < 0 || distanceAB > 2) && (distanceBA < 0 || distanceBA >2) ){
+            this.isValid = false;
+            return  false; }
 
         distanceAB = this.checkDistance(Label.ENGINE, Label.BODY);
         distanceBA = this.checkDistance(Label.BODY, Label.ENGINE);
-        if( (distanceAB < 0 || distanceAB > 2) && (distanceBA < 0 || distanceBA >2) ){ return  false; }
+        if( (distanceAB < 0 || distanceAB > 2) && (distanceBA < 0 || distanceBA >2) ){
+            this.isValid = false;
+            return  false; }
 
         distanceAB = this.checkDistance(Label.BODY, Label.ON_BOARD_COMPUTER);
         distanceBA = this.checkDistance(Label.ON_BOARD_COMPUTER, Label.BODY);
-        if( (distanceAB < 0 || distanceAB > 2) && (distanceBA < 0 || distanceBA >2) ){ return  false; }
+        if( (distanceAB < 0 || distanceAB > 2) && (distanceBA < 0 || distanceBA >2) ){
+            this.isValid = false;
+            return  false; }
 
         distanceAB = this.checkDistance(Label.ENGINE, Label.BATTERY);
-        if( distanceAB != 1){ return  false; }
+        if( distanceAB != 1){
+            this.isValid = false;
+            return  false; }
 
         distanceAB = this.checkDistance(Label.ON_BOARD_COMPUTER, Label.CONTROL_PANEL);
-        if( distanceAB != 1){ return  false; }
+        if( distanceAB != 1){
+            this.isValid = false;
+            return  false; }
 
+        this.isValid = true;
         return true;
     }
 }

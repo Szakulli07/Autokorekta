@@ -137,6 +137,8 @@ public abstract class Car {
 
     public abstract void addTile(Tile tile);
 
+    public abstract Label getType();
+
     public abstract String getName();
 
     public abstract Scalar getColor();
