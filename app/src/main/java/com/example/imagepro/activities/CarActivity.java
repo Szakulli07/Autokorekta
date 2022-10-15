@@ -4,17 +4,11 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import com.example.imagepro.R;
-import com.example.imagepro.Tile;
 import com.example.imagepro.cars.Car;
 
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
 
-import java.util.Iterator;
 import java.util.List;
 
 public class CarActivity extends DetectionActivity {

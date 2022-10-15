@@ -68,6 +68,11 @@ public class TileActivity extends DetectionActivity {
                     new Point(tile.getCarPart().getCenterX() - tile.getSize()/2f, tile.getCarPart().getCenterY() - tile.getSize()/2f),
                     new Point(tile.getCarPart().getCenterX() + tile.getSize()/2f, tile.getCarPart().getCenterY() + tile.getSize()/2f),
                     color, 2);
+
+            Imgproc.putText(out, tile.getLabel().toString(),
+                    new Point(tile.getCarPart().getCenterX() - tile.getSize()/2f, tile.getCarPart().getCenterY() + tile.getSize()/2),
+                    Core.FONT_HERSHEY_SIMPLEX,
+                    0.75f, color, 2);
         }
         // Rotate back by -90 degree
         Core.flip(out.t(), out, 0);

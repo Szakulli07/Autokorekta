@@ -25,7 +25,8 @@ public enum Label {
     HYBRID,
     ON_BOARD_COMPUTER,
     SOLAR,
-    SUNROOF;
+    SUNROOF,
+    BIO_HYBRID;
 
     private static final List<Label> values = Arrays.asList(Label.values());
 
@@ -41,7 +42,8 @@ public enum Label {
             Label.BLANK,
             Label.ELECTRIC,
             Label.HYBRID,
-            Label.SOLAR
+            Label.SOLAR,
+            Label.BIO_HYBRID
     );
 
     private static final List<Label> mainLabels = Arrays.asList(

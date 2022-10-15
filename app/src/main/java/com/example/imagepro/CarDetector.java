@@ -1,11 +1,15 @@
 package com.example.imagepro;
 
-import com.example.imagepro.cars.BiofuelCar;
 import com.example.imagepro.cars.BlankCar;
 import com.example.imagepro.cars.Car;
-import com.example.imagepro.cars.ElectricCar;
-import com.example.imagepro.cars.HybridCar;
-import com.example.imagepro.cars.SolarCar;
+import com.example.imagepro.cars.newTechnology.NewBiofuelCar;
+import com.example.imagepro.cars.newTechnology.NewElectricCar;
+import com.example.imagepro.cars.newTechnology.NewHybridCar;
+import com.example.imagepro.cars.newTechnology.NewSolarCar;
+import com.example.imagepro.cars.oldTechnology.BiofuelCar;
+import com.example.imagepro.cars.oldTechnology.ElectricCar;
+import com.example.imagepro.cars.oldTechnology.HybridCar;
+import com.example.imagepro.cars.oldTechnology.SolarCar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.stream.Collectors;
 
 public class CarDetector {
 
@@ -28,23 +31,30 @@ public class CarDetector {
     }
 
     public void detectCars(List<Tile> tiles){
-        Map<Boolean, List<Tile>> partitions = tiles.stream()
-                .collect(Collectors.partitioningBy(tile -> tile.getCarPart().getLabel() == Label.CHASSIS));
 
-        if(partitions.get(true) == null) {
-            return;
-        }
-
-        Queue<Tile> startTiles = new LinkedList<>(partitions.get(true));
+        Queue<Tile> startTiles = this.getStartingPoints(tiles);
 
         Map<Tile, Boolean> seenPoints = new HashMap<>();
         for (Tile tile: tiles) {
             seenPoints.put(tile, Boolean.FALSE);
         }
 
-        List<Car> beforeRotationCars = this.carBFS(startTiles, seenPoints);
+        List<Car> cars = this.carBFS(startTiles, seenPoints);
 
-        this.setCars(beforeRotationCars);
+        this.setCars(cars);
+    }
+
+    private Queue<Tile> getStartingPoints(List<Tile> tiles){
+        Queue<Tile> startingPoints = new LinkedList<>();
+        for(Tile tile: tiles){
+            if(tile.getCarPart().getLabel() == Label.CHASSIS && !tile.isNewTechnology()){
+                startingPoints.add(tile);
+            }else if(tile.getCarPart().getLabel() == Label.ON_BOARD_COMPUTER && tile.isNewTechnology()){
+                startingPoints.add(tile);
+            }
+        }
+
+        return startingPoints;
     }
 
     private List<Car> carBFS(Queue<Tile> startPoints, Map<Tile, Boolean> seenPoints){
@@ -52,20 +62,41 @@ public class CarDetector {
 
         while (!startPoints.isEmpty()){
             Tile startPoint = startPoints.poll();
+
+            if(seenPoints.get(startPoint)) {
+                continue;
+            }
+
             Car car;
 
-            switch (startPoint.getCarType()){
+            switch (startPoint.getLabel()){
                 case BIOFUEL:
-                    car = new BiofuelCar(startPoint);
+                    if(startPoint.getCarPart().getLabel() == Label.CHASSIS){
+                        car = new BiofuelCar(startPoint);
+                    }else{
+                        car = new NewBiofuelCar(startPoint);
+                    }
                     break;
                 case HYBRID:
-                    car = new HybridCar(startPoint);
+                    if(startPoint.getCarPart().getLabel() == Label.CHASSIS){
+                        car = new HybridCar(startPoint);
+                    }else{
+                        car = new NewHybridCar( startPoint);
+                    }
                     break;
                 case ELECTRIC:
-                    car = new ElectricCar(startPoint);
+                    if(startPoint.getCarPart().getLabel() == Label.CHASSIS){
+                        car = new ElectricCar(startPoint);
+                    }else{
+                        car = new NewElectricCar(startPoint);
+                    }
                     break;
                 case SOLAR:
-                    car = new SolarCar(startPoint);
+                    if(startPoint.getCarPart().getLabel() == Label.CHASSIS){
+                        car = new SolarCar(startPoint);
+                    }else{
+                        car = new NewSolarCar(startPoint);
+                    }
                     break;
                 default:
                     car = new BlankCar(startPoint);
@@ -74,9 +105,7 @@ public class CarDetector {
 
             Queue<Tile> carQueue = new LinkedList<>();
 
-            if(startPoint.getCarType() != Label.BLANK){
-                carQueue.add(startPoint);
-            }
+            carQueue.add(startPoint);
 
             while(!carQueue.isEmpty()){
                 Tile tile = carQueue.poll();
@@ -85,8 +114,7 @@ public class CarDetector {
                 for (Tile neighbourTile: tile.getNeighbours()) {
 
                     if(!seenPoints.get(neighbourTile)
-                            && neighbourTile.getRotation() == tile.getRotation()
-                            && neighbourTile.getCarType() == tile.getCarType()){
+                            && neighbourTile.getRotation() == tile.getRotation()){
                         seenPoints.replace(neighbourTile, Boolean.TRUE);
                         carQueue.add(neighbourTile);
                         car.addTile(neighbourTile);

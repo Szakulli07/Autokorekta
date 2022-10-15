@@ -1,6 +1,7 @@
 package com.example.imagepro;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,12 +14,16 @@ public class Tile {
     private List<Tile> neighbours = new ArrayList<>();
     private final Prediction carPart;
 
+
     private float size=0;
+    private Label label = Label.BLANK;
+    private boolean isNewTechnology=false;
     private Rotation rotation;
 
     public Tile(Prediction carPart, List<Prediction> carTypes) {
         this.carPart = carPart;
         this.carTypes = carTypes;
+        this.setLabel();
         this.setRotation();
         this.setSize();
     }
@@ -170,18 +175,31 @@ public class Tile {
 
         if(distance < this.size*0.1f){ return;}
 
-        switch (this.getCarPart().getLabel()){
-            case AUTOMATIC_STEERING:
-                if(distance > this.size*1.4f){ return;}
-                break;
-            case ENERGY_SAVING_SYSTEM:
-            case ELECTROMAGNETIC_ANTI_COLLISION_SYSTEM:
-                if(distance > this.size*1.6f){ return;}
-                break;
-            default:
-                if(distance > this.size*1.25f){ return;}
-                break;
+        if(!this.isNewTechnology){
+            switch (this.getCarPart().getLabel()){
+                case AUTOMATIC_STEERING:
+                    if(distance > this.size*1.4f){ return;}
+                    break;
+                case ENERGY_SAVING_SYSTEM:
+                case ELECTROMAGNETIC_ANTI_COLLISION_SYSTEM:
+                    if(distance > this.size*1.6f){ return;}
+                    break;
+                default:
+                    if(distance > this.size*1.25f){ return;}
+                    break;
+            }
+        }else{
+            switch (this.getCarPart().getLabel()){
+                case ENGINE:
+                case ON_BOARD_COMPUTER:
+                    if(distance > this.size*1.6f){ return;}
+                    break;
+                default:
+                    if(distance > this.size*1.3f){ return;}
+                    break;
+            }
         }
+
 
         this.neighbours.add(neighbour);
     }
@@ -190,13 +208,55 @@ public class Tile {
         return this.neighbours;
     }
 
-    public Label getCarType(){
-        List<Prediction> notEmptyTiles = this.carTypes.stream()
-                .filter(ct -> ct.getLabel() != Label.BLANK).collect(Collectors.toList());
-        if(notEmptyTiles.size() != 1){
-            return Label.BLANK;
-        }else{
-            return notEmptyTiles.get(0).getLabel();
+    private void setLabel(){
+        List<Label> labels = this.carTypes.stream()
+                .map(Prediction::getLabel)
+                .collect(Collectors.toList());
+
+        switch (labels.size()) {
+            case 1:
+                this.label = labels.get(0);
+                break;
+            case 2:
+                if (labels.containsAll(Arrays.asList(Label.ELECTRIC, Label.SOLAR))) {
+                    this.label = Label.BIO_HYBRID;
+                }  else if (labels.containsAll(Arrays.asList(Label.BLANK, Label.SOLAR))){
+                    this.label = Label.ELECTRIC;
+                } else if(labels.contains(Label.BLANK) && !labels.contains(Label.BIOFUEL)
+                        && !labels.contains(Label.HYBRID)
+                        && !labels.contains(Label.ELECTRIC)
+                        && !labels.contains(Label.SOLAR)){
+                    this.label = Label.SOLAR;
+                } else{
+                    this.label = Label.BLANK;
+                }
+
+                this.isNewTechnology = true;
+                break;
+            case 3:
+                if (labels.containsAll(Arrays.asList(Label.HYBRID, Label.ELECTRIC, Label.SOLAR))) {
+                    this.label = Label.BIOFUEL;
+                } else if (labels.containsAll(Arrays.asList(Label.BLANK, Label.ELECTRIC, Label.SOLAR))) {
+                    this.label = Label.HYBRID;
+                }else if(labels.containsAll(Arrays.asList(Label.BLANK, Label.SOLAR)) && !labels.contains(Label.HYBRID) && !labels.contains(Label.ELECTRIC)){
+                    this.label = Label.ELECTRIC;
+                }else if(labels.contains(Label.BLANK) && !labels.contains(Label.HYBRID) && !labels.contains(Label.ELECTRIC)  && !labels.contains(Label.SOLAR)) {
+                    this.label = Label.SOLAR;
+                }else {
+                    this.label = Label.BLANK;
+                }
+                this.isNewTechnology = true;
+                break;
+            default:
+                this.label = Label.BLANK;
+                break;
         }
+
     }
+
+    public Label getLabel() {
+        return this.label;
+    }
+
+    public boolean isNewTechnology() { return this.isNewTechnology; }
 }

@@ -5,10 +5,18 @@ import com.example.imagepro.Tile;
 
 import org.opencv.core.Scalar;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class BlankCar extends Car{
 
+    List<Tile> tiles = new ArrayList<>();
+
+    List<Label> neededLabels = Arrays.asList();
+
     public BlankCar(Tile startingTile){
-        super(startingTile);
+        this.tiles.add(startingTile);
     }
 
     @Override
@@ -22,9 +30,18 @@ public class BlankCar extends Car{
     }
 
     @Override
+    public List<Tile> getTiles() {
+        return tiles;
+    }
+
+    @Override
+    public List<Label> getNeededLabels() {
+        return neededLabels;
+    }
+
+    @Override
     public void addTile(Tile tile) {
-        if(tile.getCarType() == Label.BLANK
-                && tile.getRotation() == this.tiles.get(0).getRotation()){
+        if(tile.getRotation() == this.tiles.get(0).getRotation()){
             this.tiles.add(tile);
         }
     }

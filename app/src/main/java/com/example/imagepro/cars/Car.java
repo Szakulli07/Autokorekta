@@ -10,7 +10,6 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -21,21 +20,14 @@ import java.util.stream.Collectors;
 
 public abstract class Car {
 
-    List<Tile> tiles = new ArrayList<>();
-    List<Label> neededLabels = new ArrayList<>();
-    String drawType = "C";
-    Scalar drawColor = new Scalar(255, 0, 0);
-
-    public Car(Tile startingTile){
-        this.tiles.add(startingTile);
-    }
-
     public Rotation getRotation(){
-        return this.tiles.get(0).getRotation();
+        return this.getTiles().get(0).getRotation();
     }
 
     protected int checkDistance(Label firstLabel, Label secondLabel){
         Tile firstTile = null;
+
+        List<Tile> tiles = this.getTiles();
 
         for(Tile tile: tiles){
             if(tile.getCarPart().getLabel() == firstLabel){
@@ -69,7 +61,7 @@ public abstract class Car {
                     return distance.get(tile)+1;
                 }
 
-                if(!seenTiles.get(neighbourTile) &&
+                if(seenTiles.containsKey(neighbourTile) && !seenTiles.get(neighbourTile) &&
                     Label.labelGroup(neighbourTile.getCarPart().getLabel()) == Label.labelGroup(tile.getCarPart().getLabel())){
                     seenTiles.replace(neighbourTile, Boolean.TRUE);
                     distance.replace(neighbourTile, distance.get(tile)+1);
@@ -82,6 +74,10 @@ public abstract class Car {
     }
 
     public boolean isValid(){
+
+        List<Tile> tiles = this.getTiles();
+        List<Label> neededLabels = this.getNeededLabels();
+
         if(neededLabels.size() != tiles.size()){
             return false;
         }
@@ -125,9 +121,11 @@ public abstract class Car {
 
         }
 
+        List<Tile> tiles = this.getTiles();
+
         for (Tile tile: tiles) {
             Imgproc.putText(out, rotation + "_" + this.getName(),
-                    new Point(tile.getCarPart().getCenterX() - tile.getSize()/2f, tile.getCarPart().getCenterY()),
+                    new Point(tile.getCarPart().getCenterX() - tile.getSize()/4f, tile.getCarPart().getCenterY()),
                     Core.FONT_HERSHEY_SIMPLEX,
                     0.75f, color, 2);
         }
@@ -142,5 +140,9 @@ public abstract class Car {
     public abstract String getName();
 
     public abstract Scalar getColor();
+
+    public abstract List<Tile> getTiles();
+
+    public abstract List<Label> getNeededLabels();
 
 }
