@@ -195,7 +195,7 @@ public class Tile {
                     if(distance > this.size*1.6f){ return;}
                     break;
                 default:
-                    if(distance > this.size*1.3f){ return;}
+                    if(distance > this.size*1.4f){ return;}
                     break;
             }
         }

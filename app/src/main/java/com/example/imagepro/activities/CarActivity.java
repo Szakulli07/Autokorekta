@@ -63,13 +63,6 @@ public class CarActivity extends DetectionActivity {
     @SuppressLint("SetTextI18n")
     protected Mat drawPredicts(Mat in, List<Car> cars){
 
-        if(cars.isEmpty()){
-            return  in;
-        }
-
-        Mat out= new Mat();
-        in.copyTo(out);
-
         Map<Label, Integer> scores = new HashMap<Label, Integer>() {{
             put(Label.BLANK, 0);
             put(Label.BIOFUEL, 0);
@@ -79,7 +72,16 @@ public class CarActivity extends DetectionActivity {
 
         }};
 
-        scores.put(Label.BLANK, 0);
+        if(cars.isEmpty()){
+            bioScore.setText("B: " + scores.get(Label.BIOFUEL));
+            hybScore.setText("H: " + scores.get(Label.HYBRID));
+            eleScore.setText("E: " + scores.get(Label.ELECTRIC));
+            solScore.setText("S: " + scores.get(Label.SOLAR));
+            return  in;
+        }
+
+        Mat out= new Mat();
+        in.copyTo(out);
 
         for(Car car: cars){
             out = car.draw(out);

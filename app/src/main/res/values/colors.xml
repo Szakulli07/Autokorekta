@@ -12,4 +12,9 @@
     <color name="green">#84E119</color>
     <color name="yellow">#F4DA23</color>
     <color name="orange">#DF790B</color>
+    <color name="primary_100">#284B5A</color>
+    <color name="primary_300">#002A3B</color>
+    <color name="primary_800">#001422</color>
+    <color name="secondary_300">#BACAD2</color>
+
 </resources>

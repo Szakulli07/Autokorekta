@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cameraButton"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="0dp"
+    android:alignmentMode="alignBounds"
+    android:background="@color/primary_300"
+    android:columnCount="2"
+    android:rowCount="3"
+    android:useDefaultMargins="true"
+    tools:context=".activities.TestActivity" >
+
+    <TextView
+        android:id="@+id/testTitle"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="120dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/menuTitle"
+        android:textAlignment="center"
+        android:textColor="@color/secondary_300"
+        android:textSize="48sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="96dp"
+        android:layout_marginTop="50dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/testTitle">
+
+        <android.widget.Button
+            android:id="@+id/region_button"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="10sp"
+            android:background="@drawable/rounded_corner"
+            android:fontFamily="sans-serif-medium"
+            android:padding="10sp"
+            android:text="@string/region"
+            android:textColor="@color/secondary_300"
+            android:textSize="28sp" />
+
+        <android.widget.Button
+            android:id="@+id/label_button"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="10sp"
+            android:background="@drawable/rounded_corner"
+            android:padding="10sp"
+            android:text="@string/label"
+            android:textColor="@color/secondary_300"
+            android:textSize="28sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="wrap_content"
+        android:layout_height="96dp"
+        android:layout_marginTop="30dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+
+        <android.widget.Button
+
+            android:id="@+id/tile_button"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="10sp"
+            android:background="@drawable/rounded_corner"
+            android:padding="10sp"
+            android:text="@string/title"
+            android:textColor="@color/secondary_300"
+            android:textSize="28sp" />
+
+        <android.widget.Button
+            android:id="@+id/rotation_button"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="10sp"
+            android:background="@drawable/rounded_corner"
+            android:padding="10sp"
+            android:text="@string/rotation"
+            android:textColor="@color/secondary_300"
+            android:textSize="28sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="96dp"
+        android:layout_marginTop="30dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+
+        <android.widget.Button
+            android:id="@+id/graph_button"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="10sp"
+            android:background="@drawable/rounded_corner"
+            android:padding="10sp"
+            android:text="@string/graph"
+            android:textColor="@color/secondary_300"
+            android:textSize="28sp" />
+
+        <android.widget.Button
+            android:id="@+id/car_button"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="10sp"
+            android:background="@drawable/rounded_corner"
+            android:padding="10sp"
+            android:text="@string/car"
+            android:textColor="@color/secondary_300"
+            android:textSize="28sp" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -43,7 +43,7 @@ public class ObjectDetector {
         Interpreter.Options options = new Interpreter.Options();
         CompatibilityList compatList = new CompatibilityList();
 
-        if (compatList.isDelegateSupportedOnThisDevice()) {
+        if (false && compatList.isDelegateSupportedOnThisDevice()) {
             // if the device has a supported GPU, add the GPU delegate
             GpuDelegate.Options delegateOptions = compatList.getBestOptionsForThisDevice();
             GpuDelegate gpuDelegate = new GpuDelegate(delegateOptions);

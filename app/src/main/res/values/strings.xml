@@ -1,10 +1,11 @@
 <resources>
-    <string name="app_name">ImagePro</string>
+    <string name="app_name">AutoKorekta</string>
     <string name="region">Region</string>
     <string name="label">Label</string>
     <string name="title">Tile</string>
-    <string name="rotation">Rotation</string>
+    <string name="rotation">Angle</string>
     <string name="graph">Graph</string>
     <string name="car">Car</string>
+    <string name="menuTitle">AutoKorekta</string>
 
 </resources>
