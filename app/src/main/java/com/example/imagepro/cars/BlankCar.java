@@ -82,7 +82,7 @@ public class BlankCar extends Car{
                     new Point(tile.getCarPart().getLeftX(),
                             tile.getCarPart().getUpperY()),
                     Core.FONT_HERSHEY_SIMPLEX,
-                    2f, new Scalar(256, 256, 256), 2);
+                    0.75f, new Scalar(256, 256, 256), 2);
         }
 
         Core.flip(out.t(), out, 0);

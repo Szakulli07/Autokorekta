@@ -114,13 +114,13 @@ public abstract class Car {
                 extraText = "_T";
                 break;
             case NOT_ENOUGH:
-                extraText = "_NE";
+                extraText = "_E";
                 break;
             case MAIN_CONNECTIONS:
-                extraText = "_MC";
+                extraText = "_M";
                 break;
             case EXTRA_CONNECTIONS:
-                extraText = "_EC";
+                extraText = "_O";
                 break;
             case VALID:
                 text = text.toUpperCase();
@@ -130,7 +130,8 @@ public abstract class Car {
         for (Tile tile: tiles) {
 
             Imgproc.putText(out, text + extraText,
-                    new Point(tile.getCarPart().getCenterX() - tile.getSize()/4f, tile.getCarPart().getCenterY()),
+                    new Point(tile.getCarPart().getCenterX() - tile.getSize()/3f,
+                            tile.getCarPart().getCenterY() + tile.getSize()/8f),
                     Core.FONT_HERSHEY_SIMPLEX,
                     0.75f, color, 2);
         }

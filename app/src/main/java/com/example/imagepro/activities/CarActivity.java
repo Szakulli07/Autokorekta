@@ -27,6 +27,11 @@ public class CarActivity extends DetectionActivity {
     TextView eleScore;
     TextView solScore;
 
+    TextView bioScoreLabel;
+    TextView hybScoreLabel;
+    TextView eleScoreLabel;
+    TextView solScoreLabel;
+
     @SuppressLint("SetTextI18n")
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,10 +45,16 @@ public class CarActivity extends DetectionActivity {
         this.eleScore = findViewById(R.id.ele_score);
         this.solScore = findViewById(R.id.sol_score);
 
-        bioScore.setText("B: " + 0);
-        hybScore.setText("H: " + 0);
-        eleScore.setText("E: " + 0);
-        solScore.setText("S: " + 0);
+        this.bioScoreLabel = findViewById(R.id.bio_score_label);
+        this.hybScoreLabel = findViewById(R.id.hyb_score_label);
+        this.eleScoreLabel = findViewById(R.id.ele_score_label);
+        this.solScoreLabel = findViewById(R.id.sol_score_label);
+
+        this.bioScoreLabel.setText("B: ");
+        this.hybScoreLabel.setText("H: ");
+        this.eleScoreLabel.setText("E: ");
+        this.solScoreLabel.setText("S: ");
+
     }
 
     @Override
@@ -97,22 +108,22 @@ public class CarActivity extends DetectionActivity {
                         new Point(wrongTile.getCarPart().getLeftX(),
                                 wrongTile.getCarPart().getUpperY()),
                         Core.FONT_HERSHEY_SIMPLEX,
-                        2f, new Scalar(256, 256, 256), 2);
+                        0.75f, new Scalar(256, 256, 256), 2);
             }else{
                 Imgproc.putText(out, "O",
                         new Point(wrongTile.getCarPart().getCenterX() - wrongTile.getSize() / 8f,
                                 wrongTile.getCarPart().getCenterY() + wrongTile.getSize() / 8f),
                         Core.FONT_HERSHEY_SIMPLEX,
-                        2f, new Scalar(256, 256, 256), 4);
+                        0.75f, new Scalar(256, 256, 256), 4);
             }
         }
 
         Core.flip(out.t(), out, 0);
 
-        bioScore.setText("B: " + scores.get(Label.BIOFUEL));
-        hybScore.setText("H: " + scores.get(Label.HYBRID));
-        eleScore.setText("E: " + scores.get(Label.ELECTRIC));
-        solScore.setText("S: " + scores.get(Label.SOLAR));
+        bioScore.setText(scores.get(Label.BIOFUEL).toString());
+        hybScore.setText(scores.get(Label.HYBRID).toString());
+        eleScore.setText(scores.get(Label.ELECTRIC).toString());
+        solScore.setText(scores.get(Label.SOLAR).toString());
 
         return out;
     }

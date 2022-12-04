@@ -128,6 +128,10 @@ public class CarDetector {
             cars.add(car);
         }
 
+        for(Car car: cars){
+            car.isValid();
+        }
+
         this.wrongTiles = seenPoints.entrySet()
                 .stream()
                 .filter(entry -> entry.getValue() == Boolean.FALSE)
