@@ -53,6 +53,7 @@ public class CarGame {
         return objectDetector.getPredicts();
     }
     public List<Car> getCars() { return  carDetector.getCars(); }
+    public List<Tile> getWrongTiles() { return carDetector.getWrongTiles(); }
 
 }
 

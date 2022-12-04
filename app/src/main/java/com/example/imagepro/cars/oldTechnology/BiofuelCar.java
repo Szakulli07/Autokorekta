@@ -3,6 +3,7 @@ package com.example.imagepro.cars.oldTechnology;
 import com.example.imagepro.Label;
 import com.example.imagepro.Tile;
 import com.example.imagepro.cars.Car;
+import com.example.imagepro.cars.CarStatus;
 
 import org.opencv.core.Scalar;
 
@@ -24,6 +25,8 @@ public class BiofuelCar extends Car {
 
     private Boolean isValid = null;
 
+    private CarStatus carStatus = CarStatus.ERROR;
+
     public BiofuelCar(Tile startingTile){
         this.tiles.add(startingTile);
     }
@@ -32,13 +35,18 @@ public class BiofuelCar extends Car {
     public Label getType(){ return Label.BIOFUEL;}
 
     @Override
+    public CarStatus getStatus() {
+        return carStatus;
+    }
+
+    @Override
     public String getName() {
-        return "Bio";
+        return "BIO";
     }
 
     @Override
     public Scalar getColor() {
-        return new Scalar(232, 39, 177);
+        return new Scalar(232, 39, 39);
     }
 
     @Override
@@ -66,6 +74,7 @@ public class BiofuelCar extends Car {
         }
 
         if(neededLabels.size() != tiles.size()){
+            this.carStatus = CarStatus.SIZE;
             this.isValid = false;
             return false;
         }
@@ -75,6 +84,7 @@ public class BiofuelCar extends Car {
                 .collect(Collectors.toList());
 
         if(!tileLabels.containsAll(neededLabels)){
+            this.carStatus = CarStatus.NOT_ENOUGH;
             this.isValid = false;
             return false;
         }
@@ -82,6 +92,7 @@ public class BiofuelCar extends Car {
         for (Tile tile: tiles) {
             if(tile.getLabel() != Label.BIOFUEL
                 || tile.isNewTechnology()){
+                this.carStatus = CarStatus.TYPE;
                 this.isValid = false;
                 return false;
             }
@@ -94,6 +105,7 @@ public class BiofuelCar extends Car {
         distanceAB = this.checkDistance(Label.CHASSIS, Label.ENGINE);
         distanceBA = this.checkDistance(Label.ENGINE, Label.CHASSIS);
         if( (distanceAB < 0 || distanceAB > 2) && (distanceBA < 0 || distanceBA >2) ){
+            this.carStatus = CarStatus.MAIN_CONNECTIONS;
             this.isValid = false;
             return  false;
         }
@@ -102,6 +114,7 @@ public class BiofuelCar extends Car {
         distanceBA = this.checkDistance(Label.BODY, Label.ENGINE);
         if( (distanceAB < 0 || distanceAB > 2) && (distanceBA < 0 || distanceBA >2) ){
             this.isValid = false;
+            this.carStatus = CarStatus.MAIN_CONNECTIONS;
             return  false;
         }
 
@@ -109,9 +122,11 @@ public class BiofuelCar extends Car {
         distanceBA = this.checkDistance(Label.ON_BOARD_COMPUTER, Label.BODY);
         if( (distanceAB < 0 || distanceAB > 2) && (distanceBA < 0 || distanceBA >2) ){
             this.isValid = false;
+            this.carStatus = CarStatus.MAIN_CONNECTIONS;
             return  false;
         }
 
+        this.carStatus = CarStatus.VALID;
         this.isValid = true;
         return true;
     }

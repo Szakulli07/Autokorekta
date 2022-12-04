@@ -3,6 +3,7 @@ package com.example.imagepro.cars.newTechnology;
 import com.example.imagepro.Label;
 import com.example.imagepro.Tile;
 import com.example.imagepro.cars.Car;
+import com.example.imagepro.cars.CarStatus;
 
 import org.opencv.core.Scalar;
 
@@ -24,8 +25,15 @@ public class NewSolarCar extends Car {
 
     private Boolean isValid = null;
 
+    private CarStatus carStatus = CarStatus.ERROR;
+
     public NewSolarCar(Tile startingTile){
         this.tiles.add(startingTile);
+    }
+
+    @Override
+    public CarStatus getStatus() {
+        return carStatus;
     }
 
     @Override
@@ -33,7 +41,7 @@ public class NewSolarCar extends Car {
 
     @Override
     public String getName() {
-        return "SOL";
+        return "NSOL";
     }
 
     @Override
@@ -66,6 +74,7 @@ public class NewSolarCar extends Car {
         }
 
         if(neededLabels.size() != tiles.size()){
+            this.carStatus = CarStatus.SIZE;
             this.isValid = false;
             return false;
         }
@@ -75,6 +84,7 @@ public class NewSolarCar extends Car {
                 .collect(Collectors.toList());
 
         if(!tileLabels.containsAll(neededLabels)){
+            this.carStatus = CarStatus.NOT_ENOUGH;
             this.isValid = false;
             return false;
         }
@@ -82,6 +92,7 @@ public class NewSolarCar extends Car {
         for (Tile tile: tiles) {
             if(!(tile.getLabel() == Label.SOLAR)
                     || !tile.isNewTechnology()){
+                this.carStatus = CarStatus.TYPE;
                 this.isValid = false;
                 return false;
             }
@@ -91,19 +102,23 @@ public class NewSolarCar extends Car {
 
         distance = this.checkDistance(Label.CHASSIS, Label.ENGINE);
         if( distance != 1 ){
+            this.carStatus = CarStatus.MAIN_CONNECTIONS;
             this.isValid = false;
             return  false; }
 
         distance = this.checkDistance(Label.ENGINE, Label.BODY);
         if( distance != 1 ){
+            this.carStatus = CarStatus.MAIN_CONNECTIONS;
             this.isValid = false;
             return  false; }
 
         distance = this.checkDistance(Label.BODY, Label.ON_BOARD_COMPUTER);
         if( distance != 1 ){
+            this.carStatus = CarStatus.MAIN_CONNECTIONS;
             this.isValid = false;
             return  false; }
 
+        this.carStatus = CarStatus.VALID;
         this.isValid = true;
         return true;
     }

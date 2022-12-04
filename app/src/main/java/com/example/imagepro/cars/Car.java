@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
 import java.util.stream.Collectors;
@@ -94,37 +95,41 @@ public abstract class Car {
 
         Core.flip(in.t(), out, 1);
 
-        String rotation = "";
-
-        switch (this.getRotation()){
-            case DOWN:
-                rotation = "D";
-                break;
-            case UPPER:
-                rotation = "U";
-                break;
-            case LEFT:
-                rotation = "L";
-                break;
-            case RIGHT:
-                rotation = "R";
-                break;
-            case ERROR:
-                rotation = "E";
-                break;
-        }
-
-        Scalar color = new Scalar(255, 0, 0);
-
-        if(this.isValid()){
-            color = this.getColor();
-
-        }
+        Scalar color = this.getColor();
 
         List<Tile> tiles = this.getTiles();
 
+        String text = this.getName().toLowerCase();
+
+        String extraText = "";
+
+        switch (this.getStatus()){
+            case ERROR:
+                extraText = "_X";
+                break;
+            case SIZE:
+                extraText = "_S";
+                break;
+            case TYPE:
+                extraText = "_T";
+                break;
+            case NOT_ENOUGH:
+                extraText = "_NE";
+                break;
+            case MAIN_CONNECTIONS:
+                extraText = "_MC";
+                break;
+            case EXTRA_CONNECTIONS:
+                extraText = "_EC";
+                break;
+            case VALID:
+                text = text.toUpperCase();
+                break;
+        }
+
         for (Tile tile: tiles) {
-            Imgproc.putText(out, rotation + "_" + this.getName(),
+
+            Imgproc.putText(out, text + extraText,
                     new Point(tile.getCarPart().getCenterX() - tile.getSize()/4f, tile.getCarPart().getCenterY()),
                     Core.FONT_HERSHEY_SIMPLEX,
                     0.75f, color, 2);
@@ -138,6 +143,8 @@ public abstract class Car {
     public abstract void addTile(Tile tile);
 
     public abstract Label getType();
+
+    public abstract CarStatus getStatus();
 
     public abstract String getName();
 

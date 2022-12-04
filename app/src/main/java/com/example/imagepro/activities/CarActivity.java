@@ -6,10 +6,15 @@ import android.widget.TextView;
 
 import com.example.imagepro.Label;
 import com.example.imagepro.R;
+import com.example.imagepro.Tile;
 import com.example.imagepro.cars.Car;
 
 import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +51,7 @@ public class CarActivity extends DetectionActivity {
         mRgba=inputFrame.rgba();
 
         List<Car> cars = this.carGame.getCars();
+        List<Tile> wrongTiles = this.carGame.getWrongTiles();
 
         if(this.carGame.accessCarGame()){
             Thread thread = new Thread() {
@@ -57,11 +63,11 @@ public class CarActivity extends DetectionActivity {
             thread.start();
         }
 
-        return this.drawPredicts(mRgba, cars);
+        return this.drawPredicts(mRgba, cars, wrongTiles);
     }
 
     @SuppressLint("SetTextI18n")
-    protected Mat drawPredicts(Mat in, List<Car> cars){
+    protected Mat drawPredicts(Mat in, List<Car> cars, List<Tile> wrongTiles){
 
         Map<Label, Integer> scores = new HashMap<Label, Integer>() {{
             put(Label.BLANK, 0);
@@ -71,14 +77,6 @@ public class CarActivity extends DetectionActivity {
             put(Label.SOLAR, 0);
 
         }};
-
-        if(cars.isEmpty()){
-            bioScore.setText("B: " + scores.get(Label.BIOFUEL));
-            hybScore.setText("H: " + scores.get(Label.HYBRID));
-            eleScore.setText("E: " + scores.get(Label.ELECTRIC));
-            solScore.setText("S: " + scores.get(Label.SOLAR));
-            return  in;
-        }
 
         Mat out= new Mat();
         in.copyTo(out);
@@ -90,6 +88,26 @@ public class CarActivity extends DetectionActivity {
                 scores.replace(car.getType(), scores.get(car.getType())+1);
             }
         }
+
+        Core.flip(out.t(), out, 1);
+
+        for(Tile wrongTile: wrongTiles){
+            if(wrongTile.getLabel() == Label.BLANK){
+                Imgproc.putText(out, "XXX",
+                        new Point(wrongTile.getCarPart().getLeftX(),
+                                wrongTile.getCarPart().getUpperY()),
+                        Core.FONT_HERSHEY_SIMPLEX,
+                        2f, new Scalar(256, 256, 256), 2);
+            }else{
+                Imgproc.putText(out, "O",
+                        new Point(wrongTile.getCarPart().getCenterX() - wrongTile.getSize() / 8f,
+                                wrongTile.getCarPart().getCenterY() + wrongTile.getSize() / 8f),
+                        Core.FONT_HERSHEY_SIMPLEX,
+                        2f, new Scalar(256, 256, 256), 4);
+            }
+        }
+
+        Core.flip(out.t(), out, 0);
 
         bioScore.setText("B: " + scores.get(Label.BIOFUEL));
         hybScore.setText("H: " + scores.get(Label.HYBRID));
