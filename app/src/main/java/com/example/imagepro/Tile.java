@@ -171,6 +171,11 @@ public class Tile {
     }
 
     public void addNeighbour(Tile neighbour){
+
+        if(this.neighbours.contains(neighbour)){
+            return;
+        }
+
         float distance = this.getDistance(neighbour);
 
         if(distance < this.size*0.1f){ return;}
@@ -202,8 +207,14 @@ public class Tile {
 
 
         this.neighbours.add(neighbour);
+        neighbour.addForceNeighbour(this);
     }
 
+    public void addForceNeighbour(Tile neighbour){
+        if(!this.neighbours.contains(neighbour)){
+            this.neighbours.add(neighbour);
+        }
+    }
     public List<Tile> getNeighbours(){
         return this.neighbours;
     }
